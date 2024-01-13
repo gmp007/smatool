@@ -1,5 +1,3 @@
----
-
 # SMATool - Strength of Materials Analysis Toolkit 
 
 
