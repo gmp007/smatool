@@ -1,0 +1,33 @@
+###############################################################################
+### The input file to control the calculation details of ystool package     ###
+###############################################################################
+#structure file name with .cif or .vasp
+structure_file = C.cif
+#Define the dimension of your material 2D/3D
+dimensional = 3D
+# strain: start, end, and interval
+strains = 0.01 0.8 0.01
+#perform compression with tensile strain
+plusminus = off
+#yieldpoint offset => For metals 0.2%
+yieldpoint_offset = 0.002
+# method_stress_calculation: DFT(static) and MD(dynamic)
+mode = dft
+# stress components and directions: Tensile_x, Tensile_y, Tensile_z, Shear (xz for 1 and 3D and xy for 2D), ideal_strength 
+components = Tensile_x Tensile_y Tensile_biaxial Shear ideal_strength
+#supercell for MD simulation
+md_supercell = 1, 1, 1
+#md time step
+md_timestep = 500
+#decide if you want to apply rotation along strain and slip directions
+rotation = on
+#slipping on. Only turn on if shear modeling is enabled
+slipon = on
+#Define strain_direction, slip_direction. For 2D, omit last Miller indices
+slip_parameters = 111, 0-11
+# vasp potential directory
+potential_dir = /home/chineduekuma/codes/vasp/PBE/
+#Use saved data. postprocessing to obtain yield strength
+use_saved_data = false
+#job submission command
+job_submit_command = mpirun -n 2 vasp_std > log.vasp

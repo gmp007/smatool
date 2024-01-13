@@ -1,0 +1,54 @@
+########################################
+###  SMATool package input control   ###
+########################################
+#choose stress calculator: VASP/QE currently supported
+code_type = vasp
+slip_parameters = 111, 0-11
+#choose method: DFT(static) and MD(dynamic)
+mode = dft
+
+#structure file name with .cif or .vasp
+structure_file = C.cif
+
+#choose dimension: 1D/2D/3D
+dimensional = 2D
+
+# strain: start, end, and interval
+strains = 0.01 0.8 0.01
+
+#perform compression with tensile 
+plusminus = off
+
+#yieldpoint offset, e.g. 0.2%
+yieldpoint_offset = 0.002
+
+#stress components: Tensile_x Tensile_y Tensile_z Tensile_biaxial indent_strength Shear (xz for 1D and 3D and xy for 2D)
+# you can writ more than one case by just listing them (no comma, just space)  
+components = Tensile_x Tensile_y Tensile_biaxial Shear
+
+#supercell for MD simulation
+md_supercell = 1, 1, 1
+
+#save structure files at each strain
+save_struct = on
+
+#molecular dynamics time step
+md_timestep = 500
+
+#apply rotation along strain (plane) and slip directions
+rotation = on
+
+#define strain direction, uses Miller indices, e.g., 11, 0-1 for 2D
+slip_parameters = 111, 0-11
+
+#slipping on; must be on/yes/1 once shear modeling is enabled
+slipon = on
+
+#explicit potential directory
+potential_dir = /potential/
+
+#Use saved data. postprocessing only
+use_saved_data = false
+
+#job submission command
+job_submit_command = vasp > log

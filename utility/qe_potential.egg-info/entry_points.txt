@@ -1,0 +1,2 @@
+[console_scripts]
+qe_potential = download_qe_pseudo:main

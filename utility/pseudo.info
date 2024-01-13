@@ -1,0 +1,10 @@
+# list of elements to download
+H, He, Li, Be, B, C, N, O, F, Ne, Na, Mg, Al, Si, P, S, Cl, Ar, K, Ca, Sc, Ti, V, Cr, Mn, Fe, Co, Ni, Cu, Zn, Ga, Ge, As, Se, Br, Kr, Rb, Sr, Y, Zr, Nb, Mo, Tc, Ru, Rh, Pd, Ag, Cd, In, Sn
+#NC potential type. check the website for updates
+NC SR (ONCVPSP v0.5)
+#Select the DFT potential
+PBE
+#Accuracy of the DFT potential
+standard
+#Format of the pseudopential
+upf

@@ -1,0 +1,9 @@
+README.txt
+setup.py
+qe_potential.egg-info/PKG-INFO
+qe_potential.egg-info/SOURCES.txt
+qe_potential.egg-info/dependency_links.txt
+qe_potential.egg-info/entry_points.txt
+qe_potential.egg-info/not-zip-safe
+qe_potential.egg-info/requires.txt
+qe_potential.egg-info/top_level.txt

@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: qe-potential
+Version: 1.0
+Summary: Utility for SMATool - Automated toolkit for computing zero and finite-temperature strength of materials
+Author: Chinedu Ekuma
+Author-email: cekuma1@gmail.com
+License: GNU GPL version 3

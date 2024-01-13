@@ -1,0 +1,395 @@
+#!/usr/bin/python
+
+"""
+  SMATool -- Automated toolkit for computing zero and finite-temperature strength of materials
+
+  This program is free software; you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software Foundation
+  version 3 of the License.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+""" 
+import os
+import shutil
+import numpy as np
+import pandas as pd
+import matplotlib
+import time
+import copy
+from datetime import datetime
+import warnings
+from read_write import read_options_from_input,load_structure #, write_incar, read_incars, read_and_write_kpoints,,convert_cif_to_vasp,modify_incar_and_restart
+from optimize_struct import optimize_structure
+from calculate_stress import calculate_stress_for_strain
+from calculate_stress_qe import calculate_stress_for_strain_qe
+from process_struct import save_contcar_data, get_contcar_data,get_contcar_data_from_qe, save_contcar_data_qe
+from process_stress import get_yield_strength_offset,get_yield_strength_linearity
+from optimize_struct_qe import optimize_structure_qe
+from stress_read_write import save_stress_data, read_stress_data, read_stress_data_2nd, wildcard_output,wildcard_output_qe
+from write_inputs import print_boxed_message, print_banner, print_banner2, print_boxed_message
+from elastic_energydensity import predict_thickness_2D,calculate_energy_densities 
+
+
+try:
+    from importlib.metadata import version  # Python 3.8+
+    version = version("SMATool") 
+except ImportError:
+    from importlib_metadata import version  # Python <3.8
+    version = version("SMATool") 
+except ImportError:
+    import pkg_resources
+    version = pkg_resources.get_distribution("SMATool").version
+
+
+warnings.filterwarnings('ignore')
+matplotlib.use('Agg')
+
+
+# Main code starts here!
+current_time = datetime.now().strftime('%H:%M:%S')
+current_date = datetime.now().strftime('%Y-%m-%d')
+start_time = time.time()
+
+options = read_options_from_input()
+code_type = options.get("code_type", "VASP")
+strain_range = options.get('strains', '0.0 0.6 0.01')  # Default to [start, end, interval] 
+do_compress = options.get('plusminus',False)
+offset = options.get("yieldpoint_offset",0.002)
+mode = options.get('mode', "DFT")
+active_components = options.get('components','xx')
+dim = options.get('dimensional','2D')
+use_saved_data = options.get('use_saved_data', False)
+save_struct = options.get('save_struct', True)
+if code_type == "VASP":
+
+    custom_options = options['custom_options']
+    base_path = custom_options.get('potential_dir', "./")
+    os.environ["VASP_PP_PATH"] = os.path.abspath("./potentials")
+
+    struct = options.get("structure_file")
+    atoms = load_structure(struct)
+    symbols = atoms.get_chemical_symbols()
+    unique_symbols = sorted(set(symbols), key=symbols.index)  # unique elements and preserve order
+    #print(unique_symbols)
+
+    # Prepare potential directories
+    potentials_path = "potentials"
+    for symbol in unique_symbols:
+        # Determine the potential directory for the current element
+        potential_dir = os.path.join(potentials_path, "potpaw_PBE", symbol)
+        
+        if os.path.exists(potential_dir):
+            shutil.rmtree(potential_dir)
+            
+        os.makedirs(potential_dir, exist_ok=True)
+
+        
+        # Check the potential file path
+        potential_potcar_paths = [
+            os.path.join(base_path, symbol, "POTCAR"),
+            os.path.join(base_path, symbol + "_pv", "POTCAR"),
+            os.path.join(base_path, symbol + "_sv", "POTCAR")
+        ]
+
+        pot_file_path = next((path for path in potential_potcar_paths if os.path.exists(path)), None)
+        if not pot_file_path:
+            raise Exception(f"POTCAR for {symbol} not found in any of the expected directories!")
+        
+        # Copy the POTCAR for the current symbol to the correct directory
+        shutil.copy(pot_file_path, potential_dir)
+        print(f"Copied POTCAR for {symbol} to {potential_dir}")
+
+
+for component in active_components:
+    print_banner(version,component,code_type, mode)
+    start, end, interval = map(float, strain_range.split())
+    
+    # Determine the interval for the first five points
+    finer_interval = interval / 2
+
+    # Generate the first five points with finer interval
+    finer_strains = [start + i * finer_interval for i in range(2)]
+
+    # Generate the remaining points with the regular interval
+    regular_strains_start = start + 2 * finer_interval
+    regular_strains = [regular_strains_start + i * interval for i in range(int((end - regular_strains_start) / interval) + 1)]
+
+    # Combine finer and regular strains
+    strains = finer_strains + regular_strains
+    
+
+    if do_compress:
+        strains = [-x for x in reversed(strains)] + strains[1:]
+
+
+    strains = [x for x in strains if x != 0.0]
+
+
+    consecutive_negative_stresses = 0
+    consecutive_decreasing_stresses = 0 
+    previous_stress = None
+    filename = f"{mode}_ys2dstress_{component}.out"
+
+    
+    if use_saved_data:
+        stressstrain_data = f"{mode}_{component}_strength.dat"
+        try:
+            atoms = load_structure("OPT/optimized_structure.cif")
+            #if code_type == "VASP":
+            #    atoms = optimize_structure(mode=mode,stress_component_list=component)
+            #elif code_type == "QE":
+            #    atoms = optimize_structure_qe(mode=mode, stress_component_list=component)            
+        except ImportError:
+            struct = options.get("structure_file")
+            atoms = load_structure(struct)
+    else:
+        strengthfile = f"{mode}_{component}_strength.dat"
+        yield_file = open(strengthfile, "w")
+    # Pre-optimization at zero strain
+        if code_type == "VASP":
+            atoms = optimize_structure(mode=mode,stress_component_list=component)  # The optimized atoms replaces the original atoms
+        elif code_type == "QE":
+            atoms = optimize_structure_qe(mode=mode, stress_component_list=component)
+ 
+
+        original_atoms = copy.deepcopy(atoms)  # Store a copy of the optimized structure
+    
+        if dim =="2D":
+            lz_angstrom = original_atoms.cell.cellpar()
+            c_length = lz_angstrom[2]/100 
+        else:
+            c_length = 1.0
+    
+        print(f"Calculating for {component} component.")
+
+        if mode == "MD":
+            if dim == "2D":
+                yield_file.write("# Strain\tStress (N/m)\tMean Volume (A^3)\tMean Energy(eV)\tMean Temperature (K)\tMean Pressure (N/m)\n")
+            else:
+                yield_file.write("# Strain\tStress (GPa)\tMean Volume (A^3)\tMean Energy(eV)\tMean Temperature (K)\tMean Pressure (GPa)\n")
+            yield_file.write("0.0\t0.0\t0.0\t0.0\t0.0\t0.0 \n")
+        elif mode == "DFT":
+            if dim =="2D":
+                yield_file.write("# Strain\tStress(N/m) \tMean Volume (A^3)\tMean Energy(eV)\tMean Pressure (N/m) \n")
+            else:
+                yield_file.write("# Strain\tStress(GPa) \tMean Volume (A^3)\tMean Energy(eV)\tMean Pressure (GPa) \n")
+            yield_file.write("0.0\t0.0\t0.0\t0.0\t0.0    \n")
+        
+        
+        
+        # Check if file exists
+        if os.path.exists(filename):
+            if not use_saved_data:
+                backup_prefix = f"{mode}_ys2dstress_{component}_"
+                for file in os.listdir():
+                    if file.startswith(backup_prefix) and file.endswith('.backup'):
+                        os.remove(file)
+                        print(f"Deleted old backup: {file}")
+
+                backup_name = f"{mode}_ys2dstress_{component}_" + time.strftime("%Y%m%d-%H%M%S") + '.backup'
+                os.rename(filename, backup_name)
+                print(f"Previous data backed up as {backup_name}")
+
+
+        if save_struct:
+            filename_struct = f"{mode}_struct_{component}.ss"
+            if os.path.exists(filename_struct):
+                os.remove(filename_struct)
+                print(f"Deleted existing file: {filename_struct}")
+
+        stresses = []
+        mean_vol_list = []
+        mean_temp_list = []
+        mean_ener_list = []
+        mean_press_list = []
+        
+        for strain in strains:
+            #print(f"\nStarting calculations for strain {strain} at {current_time } on {current_date}")
+            atoms = copy.deepcopy(original_atoms)  # Load the original structure for each strain
+
+            try:
+                
+                if code_type =="VASP":
+                    stress = calculate_stress_for_strain(atoms, strain, stress_component_list=component, dim=dim, mode=mode)
+                elif code_type =="QE":
+                    stress,temp_ase = calculate_stress_for_strain_qe(atoms, strain, stress_component_list=component, dim=dim, mode=mode)
+                    
+                else:
+                    print("Electronic structure code type not yet implemented ")
+                    exit(0)
+                if do_compress and strain <0:
+                    stress = -stress
+                if strain <= 0.02 and stress < 0:
+                    stress = abs(0.0) #For small energy cut, small strain can give negative stress!
+                
+                if code_type == "VASP":
+                    temp, vol, ener, press = wildcard_output(outcar_file="Yield/OUTCAR", vasprun_file="Yield/vasprun.xml", num_last_samples=3)
+                elif code_type == "QE":
+                    temp, vol, ener, press = wildcard_output_qe(pw_out_file="Yield/espresso.pwo", num_last_samples=3)
+                    if temp is None or temp==0:
+                        temp = temp_ase
+                if temp is None:
+                    temp = 0.0
+                if press is not None:
+                    press = press*c_length
+                else:
+                    press = None
+                if mode=="MD":
+                    mean_temp_list.append(temp)
+                mean_vol_list.append(vol)
+                mean_press_list.append(press)
+                mean_ener_list.append(ener)
+                if mode == "MD":
+                    yield_file.write(f"{strain:.6f}\t{stress:.6f}\t{vol:.6f}\t{ener:.6f}\t{temp:.6f}\t{press:.6f}\n")
+                elif mode == "DFT":
+                    yield_file.write(f"{strain:.6f}\t{stress:.6f}\t{vol:.6f}\t{ener:.6f}\t{press:.6f}\n")             
+                
+                if previous_stress is not None and stress < previous_stress:
+                    consecutive_decreasing_stresses += 1
+                else:
+                    consecutive_decreasing_stresses = 0  
+
+                if previous_stress is not None and stress < 0.8 * previous_stress and not do_compress:
+                    print("Current stress value is more than 20% smaller than the previous value. Exiting calculations.")
+                    break
+                    
+                previous_stress = stress
+
+                if consecutive_decreasing_stresses >= 5 and not do_compress:
+                    print("Encountered 5 consecutive decreasing stress values. Exiting calculations.")
+                    break 
+    
+                # Check for consecutive negative stresses
+                if stress < 0:
+                    consecutive_negative_stresses += 1
+                else:
+                    consecutive_negative_stresses = 0  # Reset the counter if stress is positive
+
+                if consecutive_negative_stresses >= 2 and not do_compress:
+                    print("Encountered consecutive negative stress values. Exiting calculations.")
+                    break  
+                yield_file.flush()
+                stresses.append(stress)
+                print(f"Strain: {strain: .4f}, Stress: {stress: .4f}")
+
+
+                if save_struct:
+                    if code_type == "VASP":
+                        atoms_vasp = get_contcar_data() 
+                        save_contcar_data(filename_struct, strain, stress, atoms_vasp)
+                    elif code_type == "QE":
+                        atoms_qe = get_contcar_data_from_qe()
+                        save_contcar_data_qe(filename_struct, strain, stress,atoms=atoms_qe)
+                    
+                #print(f"Finished calculations for strain  {strain} at {current_time } on {current_date} ")
+
+
+
+
+            except Exception as e:
+                print(f"Error during calculation at strain {strain}: {e}")
+                stresses.append(None)
+                mean_vol_list.append(None)
+                mean_temp_list.append(None)
+                mean_press_list.append(None)
+                mean_ener_list.append(None)
+
+        if mode == "DFT":
+            save_stress_data(filename, component, mode, strains, stresses, mean_vol_list, mean_ener_list,mean_press_list, None)
+        elif mode == "MD":
+            save_stress_data(filename, component, mode, strains, stresses, mean_vol_list, mean_ener_list, mean_press_list,mean_temp_list)
+
+#    if mode == "DFT":
+#        strains, stresses, mean_vol_list, mean_ener_list, mean_press_list  = read_stress_data_vasp(filename, component)
+#    elif mode =="MD":
+#        strains, stresses, mean_vol_list, mean_ener_list, mean_press_list, mean_temp_list  = read_stress_data_vasp(filename, component)
+            
+    try:
+        results = read_stress_data(filename, component, code_type, mode)
+    except Exception:
+        results = read_stress_data_2nd(stressstrain_data)
+    strains = results["strains"]
+    stresses = results["stresses"]
+    mean_vol_list = results["volumes"]
+    mean_ener_list = results["energies"]
+    mean_press_list = results["pressures"]
+    mean_temp_list = results["temps"]
+    
+                                    
+    # Convert strains and stresses to numpy arrays, excluding the zero strain point
+    strains_array = np.array([s for i, s in enumerate(strains) if strains[i] != 0])
+    stresses_array = np.array([stresses[i] for i, s in enumerate(strains) if strains[i] != 0])
+    
+    yieldstrength = get_yield_strength_offset(stresses_array, strains_array,offset=offset)
+    yieldstrength_linearity = get_yield_strength_linearity(strains_array, stresses_array)
+    #print("yieldstrength  ", yieldstrength)
+    max_stress = max(filter(lambda x: x is not None, stresses))
+    max_stress_index = stresses.index(max_stress)
+    
+    max_strain = strains[max_stress_index]
+    #max_energy = mean_ener_list[max_stress_index]
+    thickness_2D = 0.0
+    if dim=="2D":
+        thickness_2D = predict_thickness_2D(atoms, os.getcwd())
+    energy_density_MJ_L, energy_density_Wh_kg = calculate_energy_densities(max_strain, max_stress, atoms, dim, thickness_2D)
+    if isinstance(energy_density_MJ_L, np.ndarray):
+        energy_density_MJ_L = energy_density_MJ_L[0]  
+
+    if isinstance(thickness_2D, np.ndarray):
+        thickness_2D = thickness_2D[0] 
+        
+    if isinstance(energy_density_Wh_kg, np.ndarray):
+        energy_density_Wh_kg = energy_density_Wh_kg[0]  
+
+
+    if not use_saved_data:
+    
+        if yieldstrength is not None:
+            yield_file.write(f"# Energy Storage Capacity at max strain {max_strain} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg, Thickness {thickness_2D} Ang \n")
+            if dim =="2D":
+                yield_file.write(f"# Estimated yield strength: {yieldstrength:.6f} N/m\n")
+                yield_file.write(f"# Estimated yield strength using linearity method: {yieldstrength_linearity[0]:.6f} N/m")
+            else:
+                yield_file.write(f"# Estimated yield strength: {yieldstrength:.6f} GPa\n")
+                yield_file.write(f"# Estimated yield strength using linearity method: {yieldstrength_linearity[0]:.6f} GPa ")
+        else:
+            yield_file.write("# Estimated yield strength: Not available ")
+    
+        if dim == "2D":
+            yield_file.write(f"# {component} ultimate strength: {max_stress:.6f} N/m\n")
+        else:
+            yield_file.write(f"# {component} ultimate strength: {max_stress:.6f} GPa\n")
+    
+    if dim =="2D":
+        print(f"Estimated yield strength using {offset} and yield strength using linearity method are: {yieldstrength: .2f} N/m and {yieldstrength_linearity[0]: .2f} N/m \nThe {component} ultimate strength is: {max_stress:.2f} N/m ")
+    else:
+        print(f"Estimated yield strength using {offset} and yield strength using linearity method are: {yieldstrength: .2f} GPa and {yieldstrength_linearity[0]: .2f} GPa \nThe {component} ultimate strength is: {max_stress:.2f} GPa ")
+    print(f"Energy Storage Capacity at max strain {max_strain:.3f} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg")
+
+    # Save results and plot
+    # if mode == "DFT":
+    #     save_and_plot(component, stresses, strains, yieldstrength, mean_vol_list, mean_press_list, mode, None)  #(component, stresses, strains, yieldstrength)
+    # elif mode == "MD":
+    #     save_and_plot(component, stresses, strains, yieldstrength, mean_vol_list, mean_press_list, mode, mean_temp_list) 
+    end_time = time.time()  # Capture the end time
+    elapsed_time = end_time - start_time  # Calculate the elapsed time
+    if not use_saved_data:
+        if save_struct:
+            print_banner2(yield_file=strengthfile, elapsed_time=elapsed_time, filename_struct=filename_struct)
+        else:
+            print_banner2(yield_file=strengthfile, elapsed_time=elapsed_time)
+    print_boxed_message()
+    #print(f"Results are written in {filename_struct} and structure information at each given stress and strain saved in {yield_file}.")
+      
+    #print(f"Job finished at {current_time } on {current_date} using {elapsed_time:.2f} s\n")
+
+    with open("computetime.log", 'w') as f:
+        f.write(f"Calculation done in {elapsed_time:.2f} s\n")
+
+    if not use_saved_data:
+        yield_file.close()
+
+

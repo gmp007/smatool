@@ -1,0 +1,10 @@
+README.txt
+download_qe_pseudo.py
+setup.py
+qepotential.egg-info/PKG-INFO
+qepotential.egg-info/SOURCES.txt
+qepotential.egg-info/dependency_links.txt
+qepotential.egg-info/entry_points.txt
+qepotential.egg-info/not-zip-safe
+qepotential.egg-info/requires.txt
+qepotential.egg-info/top_level.txt
