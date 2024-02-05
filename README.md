@@ -19,7 +19,7 @@ The significance of SMATool lies in its ability to provide accurate and efficien
 Additionally, the SMATool package computes the yield strength for each of the strengths above, and the corresponding energy storage capacity (in MJ/L and Wh/Kg) of the material at the ultimate strain. 
 
 ## SMATool Stress Calculators
-SMATool utilizes VASP (Vienna Ab initio Simulation Package) and QE (Quantum Espresso) as its calculator, ensuring high accuracy and reliability. These powerful electronic structure codes, combined with the ASE (Atomic Simulation Environment) backend, enable detailed and precise material analysis. If you're interested in other electronic structure code as the stress calculation, we will be more than happy to collaborate in such implementations.
+SMATool utilizes VASP (Vienna Ab initio Simulation Package) and QE (Quantum Espresso) as its calculator, ensuring high accuracy and reliability. These powerful electronic structure codes, combined with the ASE (Atomic Simulation Environment) backend, enable detailed and precise material analysis. If you're interested in other electronic structure codes such as the stress calculation, we will be more than happy to collaborate in such implementations.
 
 
 ## Installation
@@ -55,7 +55,7 @@ The best way to learn how to use the SMATool package is to start with the provid
 
 1. **Create a Calculation Directory**:
    - Start by creating a directory for your calculations.
-   - Run `smatool -0` to generate main input template of the SMATool, which is the `smatool.in`.
+   - Run `smatool -0` to generate the main input template of the SMATool, which is the `smatool.in`.
 
 2. **Modify Input Files**:
    - Customize the generated files according to your project's requirements, choose the code type between VASP and QE, and specify the directory of your potential files. 
@@ -84,9 +84,12 @@ If you have used the SMATool package in your research, please cite:
 ## SMATool Utility
 ASP electronic structure calculations come with proprietary pseudopotentials included in the package. In contrast, Quantum Espresso (QE) is open source, offering a variety of sources for obtaining pseudopotentials. While no specific pseudopotential database is officially recommended for QE, we prefer the norm-conserving [Pdojo pseudopentials](http://www.pseudo-dojo.org/). The SMATool computational toolkit includes an automated utility package, `qepotential`, located in the utility folder. This tool automates the generation of pseudopotentials from the Pdojo website for all materials required to run the SMATool package with QE as the calculator. Users can also specify custom requirements in the `pseudo.info` input file. The SMATool utility package saves the potentials of various elements as `element_pdojo.upf` in the `qe_potentials` folder.
 
+## Got Questions
+To join the Google user group, post your questions, and see if your inquiries have already been addressed, you can visit the [SMA Tools User Group](https://groups.google.com/g/smatools/) on Google Groups. This platform allows for interactive discussions and access to previously answered questions, facilitating a comprehensive support community.
+
 
 ## Contact Information
-Please if you find a bug, want to extend the SMATool computational toolkit, or have an idea that you would want us to incorporate, please reach out to us. Our team is dedicated to supporting your work and enhancing capabilities and efficiency of the SMATool package.
+Please if you find a bug, want to extend the SMATool computational toolkit, or have an idea that you would want us to incorporate, please reach out to us. Our team is dedicated to supporting your work and enhancing the capabilities and efficiency of the SMATool package.
 
 Feel free to contact us via email:
 - [cekuma1@gmail.com](mailto:cekuma1@gmail.com)
