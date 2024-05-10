@@ -68,17 +68,17 @@ The best way to learn how to use the SMATool package is to start with the provid
 
 ## Citing SMATool
 If you have used the SMATool package in your research, please cite:
-  - [SMATool: An automated toolkit for strength of materials](https://doi.org/10.1016/XXXXX) - 
+  - [SMATool: An automated toolkit for strength of materials](https://doi.org/10.1016/j.cpc.2024.109189) - 
 
 @article{Ekuma2024,
   title = {SMATool: Strength of Materials Analysis Toolkit},
-  journal = {XXX},
-  volume = {XXX},
-  pages = {XXX},
+  journal = {Computer Physics Communications},
+  volume = {300},
+  pages = {109189},
   year = {2024},
-  doi = {https://doi.org/10.1016/XXXX},
-  url = {XXX},
-  author = {XXXX}
+  doi = {https://doi.org/10.1016/j.cpc.2024.109189},
+  url = {https://www.sciencedirect.com/science/article/abs/pii/S0010465524001127},
+  author = {Chinedu Ekuma}
 }
 
 ## SMATool Utility
