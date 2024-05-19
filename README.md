@@ -70,6 +70,7 @@ The best way to learn how to use the SMATool package is to start with the provid
 If you have used the SMATool package in your research, please cite:
   - [SMATool: Strength of materials analysis toolkit](https://doi.org/10.1016/j.cpc.2024.109189) - 
 
+```latex
 @article{Ekuma2024,
   title = {SMATool: Strength of Materials Analysis Toolkit},
   journal = {Computer Physics Communications},
@@ -80,6 +81,7 @@ If you have used the SMATool package in your research, please cite:
   url = {https://www.sciencedirect.com/science/article/abs/pii/S0010465524001127},
   author = {Chinedu Ekuma}
 }
+```
 
 ## SMATool Utility
 ASP electronic structure calculations come with proprietary pseudopotentials included in the package. In contrast, Quantum Espresso (QE) is open source, offering a variety of sources for obtaining pseudopotentials. While no specific pseudopotential database is officially recommended for QE, we prefer the norm-conserving [Pdojo pseudopentials](http://www.pseudo-dojo.org/). The SMATool computational toolkit includes an automated utility package, `qepotential`, located in the utility folder. This tool automates the generation of pseudopotentials from the Pdojo website for all materials required to run the SMATool package with QE as the calculator. Users can also specify custom requirements in the `pseudo.info` input file. The SMATool utility package saves the potentials of various elements as `element_pdojo.upf` in the `qe_potentials` folder.
