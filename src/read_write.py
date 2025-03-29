@@ -1,5 +1,5 @@
 """
-  SMATool -- Automated toolkit for computing zero and finite-temperature strength of materials
+  THICK-2D -- Thickness Hierarchy Inference & Calculation Kit for 2D materials
 
   This program is free software; you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software Foundation
@@ -21,11 +21,23 @@ import glob
 from math import gcd
 import re
 from write_inputs import write_default_input, write_default_ystool_in, print_default_input_message_0, print_default_input_message_1, print_default_input_message_0
-
+from smatoolgui import display_help, smatoolguicall
 
 def read_options_from_input():
 
     cwd = os.getcwd()
+
+    gui_flag = False
+    if len(sys.argv) > 1:
+        first_arg = sys.argv[1].lower()
+        gui_flag = first_arg in ["-gui"]
+
+
+    if gui_flag:
+        smatoolguicall()
+        sys.exit(0)  
+        
+        
     ystool_in_exists = os.path.exists(os.path.join(cwd, "smatool.in"))
     run_mode_flag = (len(sys.argv) > 1 and sys.argv[1] == "-0")
     if run_mode_flag and not ystool_in_exists:
@@ -45,8 +57,11 @@ def read_options_from_input():
     options = {
         'code_type': 'VASP',
         'use_saved_data': False,
+        'use_dnn_gan': False,
         'strains': [0.0, 0.6, 0.05],
         'yieldpoint_offset': 0.002,
+        'nlayers': 1,
+        'vdwgap': 3.5,
         'dimensional': [], 
         'mode': 'DFT',
         "scrystal": 'cubic',
@@ -55,6 +70,7 @@ def read_options_from_input():
         'components': [],
         'md_supercell': [1, 1, 1],
         'md_timestep': 1000,
+        'indent_radius': 0.0,
         'custom_options': {},  # to store user-defined options
         'job_submit_command': None,
         'structure_file': None,
@@ -73,24 +89,43 @@ def read_options_from_input():
                 if line.startswith("#") or not line:
                     #previous_line = line.strip()
                     continue
-                key, value = line.strip().split('=', 1)
-                key = key.strip()
-                value = value.strip()
+
+                try:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip()
+                except ValueError:
+                    print(f"Skipping invalid line: '{line}'. Expected format 'key=value'.")
+                    continue
 
                 if key in ["structure_file", "job_submit_command", "strains", "slip_parameters"]:
                     options[key] = value
                 elif key == "components":
                     options[key] = value.split()
+                elif key == "plusminus":
+                    val_lower = value.lower()
+                    if val_lower in ["on", "true", "yes", "1"]:
+                        # Tension + Compression
+                        options["plusminus"] = True
+                    elif val_lower in ["off", "false", "no", "0"]:
+                        # Tension only
+                        options["plusminus"] = False
+                    elif val_lower == "compress":
+                        # Compression only
+                        options["plusminus"] = "compress"
+                    else:
+                        print(f"Warning: Unrecognized plusminus value '{value}'. Defaulting to False.")
+                        options["plusminus"] = False
                 elif key == "md_supercell":
                     options[key] = [int(i) for i in value.split(',')]
                 elif key in ["mode","dimensional","scrystal","code_type"]:
                     options[key] = value.upper()
-                elif key in ["use_saved_data","save_struct","rotation", "slipon"]:
+                elif key in ["use_saved_data","save_struct","rotation", "slipon","use_dnn_gan"]:
                     options[key] = value.lower() in ['true', 'yes', '1','on']
                 #elif key in ["rotation", "slipon"]:
                 #    options[key] = value.lower() == 'on'
                 elif key in options:
-                    if key in ["md_timestep", "yieldpoint_offset"]:
+                    if key in ["md_timestep", "yieldpoint_offset",'nlayers','vdwgap','indent_radius']:
                         options[key] = float(value)
                     else:
                         options[key] = value.lower() == 'on'
@@ -111,7 +146,30 @@ def read_options_from_input():
         write_default_input(cwd, dim,code_type)
         print_default_input_message_1()
         sys.exit(0)
-        
+
+
+    help_arg = (len(sys.argv) > 1 and (sys.argv[1] == "-help" or sys.argv[1] == "--help" or sys.argv[1] == "--h" or sys.argv[1] == "-h"))
+    if help_arg:
+        display_help()
+        sys.exit(0)
+
+    if options.get("slipon", False):
+        options["rotation"] = True
+    else:
+        options["rotation"] = False
+         
+
+    # Validation for code_type and job_submit_command using regular expressions
+    job_submit_command = options.get("job_submit_command", "").lower()
+    if not options.get("use_saved_data"): 
+        if code_type == "VASP" and not re.search(r'vasp(_std)?|vasp_\w+', job_submit_command):
+            print("Warning: For code_type 'VASP', please set job_submit_command to the VASP executable (e.g., vasp_std, vasp_*).")
+            return None 
+        elif code_type == "QE" and not re.search(r'pw\.x', job_submit_command):
+            print("Warning: For code_type 'QE', please set job_submit_command to the Quantum Espresso executable (e.g., pw.x).")
+            return None
+     
+               
     return options
 
 
@@ -383,9 +441,22 @@ def update_qe_object(step_name, existing_qe_parameters, file_name="qe_input.in")
     raise ValueError(f"Step '{step_name}' not found in the file.")
 
 
+def validate_options(options, valid_options):
+    errors = []
+    for key, valid_values in valid_options.items():
+        value = options.get(key)
+        if value not in valid_values:
+            errors.append(f"Invalid value for '{key}': {value}. Valid options are: {', '.join(valid_values)}.")
+    return errors
 
 
-
+def validate_active_components(active_components, valid_components):
+    errors = []
+    for component in active_components:
+        if component not in valid_components:
+            errors.append(f"Invalid active component: {component}. Valid options are: {', '.join(valid_components)}.")
+    return errors
+    
 def simplify_formula(formula):
     # Parse the formula into elements and their counts
     elements = re.findall('([A-Z][a-z]*)(\d*)', formula)

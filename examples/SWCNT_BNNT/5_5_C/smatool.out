@@ -1,0 +1,36 @@
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                            Results for Tensile_z                     ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 13:01:38 on 2024-03-03        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++-====================================================================-+
+|                    This is a 1D lattice                              |
++-====================================================================-+
+                             Ultimate strain (ε) = 0.300                             
+                        Ultimate strength (σ_s) = 110.625 GPa                        
+                           Yield Strength (σ_y) = 0.000 GPa                          
+                             Stiffness (E) = 480.579 GPa                             
+                             Thickness of material = None                            
+                            Resilience (U_r) = 0.000 J/m^3                           
+                            Toughness (U_r) = 32.119 J/m^3                           
+                      Energy storage capacity (E_c) = 0.830 MJ/L                     
+                    Energy storage capacity (E_c) = 320.737 Wh/Kg                    
+                              Ductility (%D) = 30.000 %                              
+                            Ductility Index (%DI) = inf %                            
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+|              SMATool: Strength of materials analysis toolkit,                |
+|                                 C.E. Ekuma,                                  |
+|               Computer Physics Communications xxx, xxx, (2024)               |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|          for tensile and indent strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+

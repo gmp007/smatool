@@ -1,0 +1,258 @@
+2024-06-15 14:35:11 - INFO - SMATool calculation started at 14:35:11 on 2024-06-15
+2024-06-15 14:35:11 - INFO - ==================================
+2024-06-15 14:35:11 - INFO - Input file used in calculation:
+2024-06-15 14:35:11 - INFO - code_type: VASP
+2024-06-15 14:35:11 - INFO - use_saved_data: False
+2024-06-15 14:35:11 - INFO - use_dnn_gan: False
+2024-06-15 14:35:11 - INFO - strains: 0.01 0.8 0.01
+2024-06-15 14:35:11 - INFO - yieldpoint_offset: 0.002
+2024-06-15 14:35:11 - INFO - nlayers: 1
+2024-06-15 14:35:11 - INFO - vdwgap: 3.5
+2024-06-15 14:35:11 - INFO - dimensional: 2D
+2024-06-15 14:35:11 - INFO - mode: DFT
+2024-06-15 14:35:11 - INFO - scrystal: cubic
+2024-06-15 14:35:11 - INFO - plusminus: False
+2024-06-15 14:35:11 - INFO - use_schmid_factors: False
+2024-06-15 14:35:11 - INFO - components: ['Tensile_x', 'Tensile_y', 'Tensile_biaxial', 'indent_strength', 'ideal_strength', 'Shear']
+2024-06-15 14:35:11 - INFO - md_supercell: [1, 1, 1]
+2024-06-15 14:35:11 - INFO - md_timestep: 500.0
+2024-06-15 14:35:11 - INFO - indent_radius: 2.0
+2024-06-15 14:35:11 - INFO - custom_options: {'potential_dir': '/home/chineduekuma/codes/vasp/PBE'}
+2024-06-15 14:35:11 - INFO - job_submit_command: mpirun -n 2 vasp_std > log
+2024-06-15 14:35:11 - INFO - structure_file: graphene.vasp
+2024-06-15 14:35:11 - INFO - rotation: False
+2024-06-15 14:35:11 - INFO - save_struct: True
+2024-06-15 14:35:11 - INFO - slipon: False
+2024-06-15 14:35:11 - INFO - slip_parameters: 100, 111
+2024-06-15 14:35:11 - INFO - Input parameters from smatool.in ends
+2024-06-15 14:35:11 - INFO - ==================================
+2024-06-15 14:35:15 - INFO - Active component is: Tensile_x
+2024-06-15 14:35:28 - INFO - Strain:  0.0100, Stress:  3.0853
+2024-06-15 14:35:40 - INFO - Strain:  0.0150, Stress:  4.7161
+2024-06-15 14:35:54 - INFO - Strain:  0.0200, Stress:  6.2994
+2024-06-15 14:36:09 - INFO - Strain:  0.0300, Stress:  9.3279
+2024-06-15 14:36:27 - INFO - Strain:  0.0400, Stress:  12.1753
+2024-06-15 14:36:45 - INFO - Strain:  0.0500, Stress:  14.8480
+2024-06-15 14:37:03 - INFO - Strain:  0.0600, Stress:  17.3577
+2024-06-15 14:37:20 - INFO - Strain:  0.0700, Stress:  19.7019
+2024-06-15 14:37:38 - INFO - Strain:  0.0800, Stress:  21.8853
+2024-06-15 14:37:56 - INFO - Strain:  0.0900, Stress:  23.9118
+2024-06-15 14:38:15 - INFO - Strain:  0.1000, Stress:  25.7863
+2024-06-15 14:38:37 - INFO - Strain:  0.1100, Stress:  27.5098
+2024-06-15 14:39:00 - INFO - Strain:  0.1200, Stress:  29.0928
+2024-06-15 14:39:21 - INFO - Strain:  0.1300, Stress:  30.5293
+2024-06-15 14:39:40 - INFO - Strain:  0.1400, Stress:  31.8254
+2024-06-15 14:39:59 - INFO - Strain:  0.1500, Stress:  32.9823
+2024-06-15 14:40:22 - INFO - Strain:  0.1600, Stress:  34.0153
+2024-06-15 14:40:44 - INFO - Strain:  0.1700, Stress:  34.8980
+2024-06-15 14:41:09 - INFO - Strain:  0.1800, Stress:  35.6743
+2024-06-15 14:41:35 - INFO - Strain:  0.1900, Stress:  36.3148
+2024-06-15 14:41:58 - INFO - Strain:  0.2000, Stress:  36.8361
+2024-06-15 14:42:25 - INFO - Strain:  0.2100, Stress:  37.2435
+2024-06-15 14:42:49 - INFO - Strain:  0.2200, Stress:  37.5427
+2024-06-15 14:43:13 - INFO - Strain:  0.2300, Stress:  37.7454
+2024-06-15 14:43:44 - INFO - Strain:  0.2400, Stress:  37.8990
+2024-06-15 14:44:17 - INFO - Strain:  0.2500, Stress:  37.9451
+2024-06-15 14:44:50 - INFO - Strain:  0.2600, Stress:  37.9259
+2024-06-15 14:45:26 - INFO - Strain:  0.2700, Stress:  37.8557
+2024-06-15 14:45:59 - INFO - Strain:  0.2800, Stress:  37.7430
+2024-06-15 14:46:34 - INFO - Strain:  0.2900, Stress:  37.5899
+2024-06-15 14:47:09 - INFO - 
+2024-06-15 14:47:09 - INFO - Results are saved in the various component files
+2024-06-15 14:47:09 - INFO - SMATool general output is in smatool.out
+2024-06-15 14:47:09 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-15 14:47:09 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-15 14:47:09 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-15 14:47:09 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-15 14:47:09 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-15 14:47:09 - INFO - 
+2024-06-15 14:47:09 - INFO - Calculation done in 718.72
+2024-06-15 14:47:09 - INFO - Well done! GOOD LUCK!
+2024-06-15 14:47:09 - INFO - SMATool calculation Ended at 14:47:09 on 2024-06-15
+2024-06-15 14:47:09 - INFO - Active component is: Tensile_y
+2024-06-15 14:47:25 - INFO - Strain:  0.0100, Stress:  3.8818
+2024-06-15 14:47:40 - INFO - Strain:  0.0150, Stress:  5.5501
+2024-06-15 14:47:56 - INFO - Strain:  0.0200, Stress:  7.1696
+2024-06-15 14:48:11 - INFO - Strain:  0.0300, Stress:  10.2794
+2024-06-15 14:48:27 - INFO - Strain:  0.0400, Stress:  13.1680
+2024-06-15 14:48:42 - INFO - Strain:  0.0500, Stress:  15.8489
+2024-06-15 14:49:00 - INFO - Strain:  0.0600, Stress:  18.3162
+2024-06-15 14:49:18 - INFO - Strain:  0.0700, Stress:  20.5583
+2024-06-15 14:49:37 - INFO - Strain:  0.0800, Stress:  22.5657
+2024-06-15 14:49:51 - INFO - Strain:  0.0900, Stress:  24.3206
+2024-06-15 14:50:10 - INFO - Strain:  0.1000, Stress:  25.8463
+2024-06-15 14:50:29 - INFO - Strain:  0.1100, Stress:  27.1175
+2024-06-15 14:50:46 - INFO - Strain:  0.1200, Stress:  28.1619
+2024-06-15 14:51:05 - INFO - Strain:  0.1300, Stress:  29.0143
+2024-06-15 14:51:24 - INFO - Strain:  0.1400, Stress:  29.6843
+2024-06-15 14:51:43 - INFO - Strain:  0.1500, Stress:  30.1988
+2024-06-15 14:52:06 - INFO - Strain:  0.1600, Stress:  30.5628
+2024-06-15 14:52:30 - INFO - Strain:  0.1700, Stress:  30.7817
+2024-06-15 14:52:56 - INFO - Strain:  0.1800, Stress:  30.8501
+2024-06-15 14:53:19 - INFO - Strain:  0.1900, Stress:  30.7558
+2024-06-15 14:53:43 - INFO - Strain:  0.2000, Stress:  30.4757
+2024-06-15 14:54:08 - INFO - Strain:  0.2100, Stress:  30.0530
+2024-06-15 14:54:34 - INFO - Strain:  0.2200, Stress:  29.3262
+2024-06-15 14:55:03 - INFO - 
+2024-06-15 14:55:03 - INFO - Results are saved in the various component files
+2024-06-15 14:55:03 - INFO - SMATool general output is in smatool.out
+2024-06-15 14:55:03 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-15 14:55:03 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-15 14:55:03 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-15 14:55:03 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-15 14:55:03 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-15 14:55:03 - INFO - 
+2024-06-15 14:55:03 - INFO - Calculation done in 1192.46
+2024-06-15 14:55:03 - INFO - Well done! GOOD LUCK!
+2024-06-15 14:55:03 - INFO - SMATool calculation Ended at 14:55:03 on 2024-06-15
+2024-06-15 14:55:03 - INFO - Active component is: Tensile_biaxial
+2024-06-15 14:55:13 - INFO - Strain:  0.0100, Stress:  3.9251
+2024-06-15 14:55:23 - INFO - Strain:  0.0150, Stress:  5.8092
+2024-06-15 14:55:34 - INFO - Strain:  0.0200, Stress:  7.5965
+2024-06-15 14:55:43 - INFO - Strain:  0.0300, Stress:  10.8953
+2024-06-15 14:55:53 - INFO - Strain:  0.0400, Stress:  13.8554
+2024-06-15 14:56:07 - INFO - Strain:  0.0500, Stress:  16.5117
+2024-06-15 14:56:21 - INFO - Strain:  0.0600, Stress:  18.8839
+2024-06-15 14:56:34 - INFO - Strain:  0.0700, Stress:  20.9969
+2024-06-15 14:56:48 - INFO - Strain:  0.0800, Stress:  22.8718
+2024-06-15 14:57:02 - INFO - Strain:  0.0900, Stress:  24.5272
+2024-06-15 14:57:16 - INFO - Strain:  0.1000, Stress:  25.9798
+2024-06-15 14:57:30 - INFO - Strain:  0.1100, Stress:  27.2456
+2024-06-15 14:57:43 - INFO - Strain:  0.1200, Stress:  28.3376
+2024-06-15 14:57:58 - INFO - Strain:  0.1300, Stress:  29.2697
+2024-06-15 14:58:11 - INFO - Strain:  0.1400, Stress:  30.0527
+2024-06-15 14:58:26 - INFO - Strain:  0.1500, Stress:  30.7000
+2024-06-15 14:58:39 - INFO - Strain:  0.1600, Stress:  31.2207
+2024-06-15 14:58:54 - INFO - Strain:  0.1700, Stress:  31.6240
+2024-06-15 14:59:08 - INFO - Strain:  0.1800, Stress:  31.9197
+2024-06-15 14:59:21 - INFO - Strain:  0.1900, Stress:  32.1142
+2024-06-15 14:59:33 - INFO - Strain:  0.2000, Stress:  32.2152
+2024-06-15 14:59:47 - INFO - Strain:  0.2100, Stress:  32.2290
+2024-06-15 14:59:59 - INFO - Strain:  0.2200, Stress:  32.1611
+2024-06-15 15:00:11 - INFO - Strain:  0.2300, Stress:  32.0161
+2024-06-15 15:00:23 - INFO - Strain:  0.2400, Stress:  31.7980
+2024-06-15 15:00:39 - INFO - Strain:  0.2500, Stress:  31.5122
+2024-06-15 15:00:57 - INFO - 
+2024-06-15 15:00:57 - INFO - Results are saved in the various component files
+2024-06-15 15:00:57 - INFO - SMATool general output is in smatool.out
+2024-06-15 15:00:57 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-15 15:00:57 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-15 15:00:57 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-15 15:00:57 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-15 15:00:57 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-15 15:00:57 - INFO - 
+2024-06-15 15:00:57 - INFO - Calculation done in 1546.13
+2024-06-15 15:00:57 - INFO - Well done! GOOD LUCK!
+2024-06-15 15:00:57 - INFO - SMATool calculation Ended at 15:00:57 on 2024-06-15
+2024-06-15 15:00:57 - INFO - Active component is: indent_strength
+2024-06-15 15:01:15 - INFO - Strain:  0.0100, Stress:  3.1521
+2024-06-15 15:01:31 - INFO - Strain:  0.0150, Stress:  4.7772
+2024-06-15 15:01:51 - INFO - Strain:  0.0200, Stress:  6.3323
+2024-06-15 15:02:15 - INFO - Strain:  0.0300, Stress:  9.2930
+2024-06-15 15:02:41 - INFO - Strain:  0.0400, Stress:  12.0096
+2024-06-15 15:03:04 - INFO - Strain:  0.0500, Stress:  14.4597
+2024-06-15 15:03:27 - INFO - Strain:  0.0600, Stress:  16.5989
+2024-06-15 15:03:52 - INFO - Strain:  0.0700, Stress:  18.3763
+2024-06-15 15:04:25 - INFO - Strain:  0.0800, Stress:  19.7206
+2024-06-15 15:05:01 - INFO - Strain:  0.0900, Stress:  20.5227
+2024-06-15 15:05:42 - INFO - Strain:  0.1000, Stress:  20.6661
+2024-06-15 15:06:38 - INFO - 
+2024-06-15 15:06:38 - INFO - Results are saved in the various component files
+2024-06-15 15:06:38 - INFO - SMATool general output is in smatool.out
+2024-06-15 15:06:38 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-15 15:06:38 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-15 15:06:38 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-15 15:06:38 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-15 15:06:38 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-15 15:06:38 - INFO - 
+2024-06-15 15:06:38 - INFO - Calculation done in 1887.93
+2024-06-15 15:06:38 - INFO - Well done! GOOD LUCK!
+2024-06-15 15:06:38 - INFO - SMATool calculation Ended at 15:06:38 on 2024-06-15
+2024-06-15 15:06:38 - INFO - Active component is: ideal_strength
+2024-06-15 15:06:54 - INFO - Strain:  0.0100, Stress:  0.7534
+2024-06-15 15:07:10 - INFO - Strain:  0.0150, Stress:  1.5158
+2024-06-15 15:07:25 - INFO - Strain:  0.0200, Stress:  2.2792
+2024-06-15 15:07:41 - INFO - Strain:  0.0300, Stress:  3.8091
+2024-06-15 15:07:56 - INFO - Strain:  0.0400, Stress:  5.3371
+2024-06-15 15:08:11 - INFO - Strain:  0.0500, Stress:  6.8612
+2024-06-15 15:08:28 - INFO - Strain:  0.0600, Stress:  8.3915
+2024-06-15 15:08:44 - INFO - Strain:  0.0700, Stress:  9.9381
+2024-06-15 15:09:00 - INFO - Strain:  0.0800, Stress:  11.4920
+2024-06-15 15:09:17 - INFO - Strain:  0.0900, Stress:  13.0487
+2024-06-15 15:09:37 - INFO - Strain:  0.1000, Stress:  14.6064
+2024-06-15 15:10:01 - INFO - Strain:  0.1100, Stress:  16.1610
+2024-06-15 15:10:25 - INFO - Strain:  0.1200, Stress:  17.7218
+2024-06-15 15:10:50 - INFO - Strain:  0.1300, Stress:  19.2861
+2024-06-15 15:11:15 - INFO - Strain:  0.1400, Stress:  20.8526
+2024-06-15 15:11:42 - INFO - Strain:  0.1500, Stress:  22.4214
+2024-06-15 15:12:09 - INFO - Strain:  0.1600, Stress:  23.9896
+2024-06-15 15:12:36 - INFO - Strain:  0.1700, Stress:  25.5608
+2024-06-15 15:13:02 - INFO - Strain:  0.1800, Stress:  27.1325
+2024-06-15 15:13:29 - INFO - Strain:  0.1900, Stress:  28.7048
+2024-06-15 15:13:55 - INFO - Strain:  0.2000, Stress:  30.2750
+2024-06-15 15:14:25 - INFO - Strain:  0.2100, Stress:  31.8468
+2024-06-15 15:14:56 - INFO - Strain:  0.2200, Stress:  33.4140
+2024-06-15 15:15:27 - INFO - Strain:  0.2300, Stress:  34.9722
+2024-06-15 15:16:01 - INFO - Strain:  0.2400, Stress:  36.5240
+2024-06-15 15:16:36 - INFO - Strain:  0.2500, Stress:  38.0650
+2024-06-15 15:17:14 - INFO - Strain:  0.2600, Stress:  39.5871
+2024-06-15 15:17:48 - INFO - Strain:  0.2700, Stress:  41.0960
+2024-06-15 15:18:23 - INFO - Strain:  0.2800, Stress:  42.5854
+2024-06-15 15:19:04 - INFO - Strain:  0.2900, Stress:  44.0528
+2024-06-15 15:19:49 - INFO - Strain:  0.3000, Stress:  45.4966
+2024-06-15 15:20:33 - INFO - Strain:  0.3100, Stress:  46.9156
+2024-06-15 15:21:14 - INFO - Strain:  0.3200, Stress:  48.3090
+2024-06-15 15:21:58 - INFO - Strain:  0.3300, Stress:  49.6772
+2024-06-15 15:22:35 - INFO - Strain:  0.3400, Stress:  51.0190
+2024-06-15 15:23:15 - INFO - Strain:  0.3500, Stress:  52.3334
+2024-06-15 15:23:52 - INFO - Strain:  0.3600, Stress:  53.6253
+2024-06-15 15:24:34 - INFO - Strain:  0.3700, Stress:  54.8805
+2024-06-15 15:25:18 - INFO - Strain:  0.3800, Stress:  56.1024
+2024-06-15 15:26:01 - INFO - Strain:  0.3900, Stress:  57.2793
+2024-06-15 15:26:45 - INFO - Strain:  0.4000, Stress:  58.3973
+2024-06-15 15:27:31 - INFO - Strain:  0.4100, Stress:  59.4121
+2024-06-15 15:28:17 - INFO - Strain:  0.4200, Stress:  60.2498
+2024-06-15 15:29:03 - INFO - Strain:  0.4300, Stress:  60.7245
+2024-06-15 15:29:53 - INFO - Strain:  0.4400, Stress:  60.3346
+2024-06-15 15:31:10 - INFO - 
+2024-06-15 15:31:10 - INFO - Results are saved in the various component files
+2024-06-15 15:31:10 - INFO - SMATool general output is in smatool.out
+2024-06-15 15:31:10 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-15 15:31:10 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-15 15:31:10 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-15 15:31:10 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-15 15:31:10 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-15 15:31:10 - INFO - 
+2024-06-15 15:31:10 - INFO - Calculation done in 3359.88
+2024-06-15 15:31:10 - INFO - Well done! GOOD LUCK!
+2024-06-15 15:31:10 - INFO - SMATool calculation Ended at 15:31:10 on 2024-06-15
+2024-06-15 15:31:10 - INFO - Active component is: Shear
+2024-06-15 15:31:35 - INFO - Strain:  0.0100, Stress:  2.4056
+2024-06-15 15:31:51 - INFO - Strain:  0.0150, Stress:  4.0199
+2024-06-15 15:32:06 - INFO - Strain:  0.0200, Stress:  5.6617
+2024-06-15 15:32:22 - INFO - Strain:  0.0300, Stress:  9.0204
+2024-06-15 15:32:40 - INFO - Strain:  0.0400, Stress:  12.4615
+2024-06-15 15:33:00 - INFO - Strain:  0.0500, Stress:  16.0185
+2024-06-15 15:33:23 - INFO - Strain:  0.0600, Stress:  19.6856
+2024-06-15 15:33:47 - INFO - Strain:  0.0700, Stress:  23.4433
+2024-06-15 15:34:20 - INFO - Strain:  0.0800, Stress:  27.3109
+2024-06-15 15:34:54 - INFO - Strain:  0.0900, Stress:  31.2393
+2024-06-15 15:35:29 - INFO - Strain:  0.1000, Stress:  35.1993
+2024-06-15 15:36:05 - INFO - Strain:  0.1100, Stress:  39.2266
+2024-06-15 15:36:41 - INFO - Strain:  0.1200, Stress:  43.3779
+2024-06-15 15:37:22 - INFO - Strain:  0.1300, Stress:  47.7005
+2024-06-15 15:38:12 - INFO - Strain:  0.1400, Stress:  52.2077
+2024-06-15 15:39:12 - INFO - Strain:  0.1500, Stress:  56.8787
+2024-06-15 15:40:19 - INFO - Strain:  0.1600, Stress:  49.8250
+2024-06-15 15:41:17 - INFO - 
+2024-06-15 15:41:17 - INFO - Results are saved in the various component files
+2024-06-15 15:41:17 - INFO - SMATool general output is in smatool.out
+2024-06-15 15:41:17 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-15 15:41:17 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-15 15:41:17 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-15 15:41:17 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-15 15:41:17 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-15 15:41:17 - INFO - 
+2024-06-15 15:41:17 - INFO - Calculation done in 3966.19
+2024-06-15 15:41:17 - INFO - Well done! GOOD LUCK!
+2024-06-15 15:41:17 - INFO - SMATool calculation Ended at 15:41:17 on 2024-06-15

@@ -45,10 +45,10 @@ slip_parameters = 100, 111
 slipon = off
 
 #explicit potential directory
-potential_dir = /potential/
+potential_dir = /potential
 
 #Use saved data. postprocessing only
-use_saved_data = false
+use_saved_data = true
 
 #job submission command
-job_submit_command = vasp/pw.x > log
+job_submit_command = vasp_std > log

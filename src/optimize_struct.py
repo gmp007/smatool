@@ -30,13 +30,22 @@ from ase.io.trajectory import Trajectory
 from shear_tensile_constraint import ShearTensileConstraint
 from modify_incar import IncarModifier, ChangeDir,WildCard
 from read_write import read_options_from_input,write_incar, read_incars, read_and_write_kpoints,load_structure,modify_incar_and_restart, simplify_formula
-from euler_angles_rotation import calculate_euler_angles, apply_rotation, rotate, rotate_crystal_structure, apply_rotation_2D, rotate_crystal_structure_2D
+from euler_angles_rotation import apply_rotation, rotate, rotate_crystal_structure, apply_rotation_2D, rotate_crystal_structure_2D
 from euler_angles_rotation import calculate_schmid_factor, generate_slip_systems_2d_hexagonal, generate_slip_systems
 
 
 options = read_options_from_input()
 slipon = options.get("slipon",False)
-checkrotation = options.get("rotation",False)
+checkrotation = options.get("rotation", False)
+
+#checkrotation = False
+#if slipon:
+#    rotation = True
+#    checkrotation = rotation
+#else:
+#    checkrotation = options.get("rotation", False)
+   
+#checkrotation = options.get("rotation",False)
 dim = options.get("dimensional", "3D")
 use_saved_data = options.get('use_saved_data', False)
 
@@ -104,7 +113,30 @@ def run_calculation(atoms, calculator_settings, fmax=0.02, max_retries=5, retry_
 
 
 
-def string_to_tuple(s):
+def string_to_tuple(s, dim="3D"):
+    result = []
+    i = 0
+    while i < len(s):
+        if s[i] == '-':
+            # Ensure the next character is a digit and combine it with the minus sign
+            if i + 1 < len(s) and s[i + 1].isdigit():
+                result.append(-int(s[i + 1]))
+                i += 2
+        elif s[i].isdigit():
+            result.append(int(s[i]))
+            i += 1
+        else:
+            # Skip any non-digit, non-minus characters
+            i += 1
+    
+    if dim == "2D" and len(result) > 2:
+        # Remove the last element if dim is "2D" and there are more than 2 elements
+        result = result[:2]
+
+    return tuple(result)
+
+
+def string_to_tupleold(s):
     result = []
     i = 0
     while i < len(s):
@@ -191,8 +223,8 @@ def optimize_structure(mode,stress_component_list):
 
     #rotation_dir = options.get("strain_direction")
     strain_direction, slip_direction = options.get("slip_parameters").split(", ")
-    slip_direction = string_to_tuple(slip_direction)
-    strain_direction = string_to_tuple(strain_direction)
+    slip_direction = string_to_tuple(slip_direction, dim)
+    strain_direction = string_to_tuple(strain_direction, dim)
         
     if not os.path.exists("OPT"):
         os.mkdir("OPT")
@@ -237,19 +269,27 @@ def optimize_structure(mode,stress_component_list):
             else:            
                 rotate_crystal_structure("current_structure.vasp", strain_direction, slip_direction, dim, atoms,slipon)
             atoms = read("POSCAR_rotated")
-            #write("POSCAR", atoms,format='vasp', direct=True)
             write("structure_rotated.cif", atoms)
-
+            #os.system("rm -rf POSCAR_rotated")
+            os.system("rm -rf current_structure.vasp")
+            
             # Calculate Schmid factor
             strain_dir = strain_direction #string_to_tuple(options.get("strain_direction"))
             if dim =="2D":
                 slip_systems = generate_slip_systems_2d_hexagonal()
                 schmid_factors = [calculate_schmid_factor(normal, direction, strain_dir) for normal, direction in slip_systems]
-                crystal_system = spglib.get_spacegroup(atoms,symprec=0.1)
+                try:
+                    lattice = atoms.cell.array
+                    positions = atoms.get_scaled_positions()
+                    numbers = atoms.numbers
+                    cell = (lattice, positions, numbers)                   
+                    crystal_system = spglib.get_spacegroup(cell,symprec=0.1)
+                except TypeError:
+                    crystal_system = spglib.get_spacegroup(atoms,symprec=0.1)
             elif dim =="3D":
                 slip_systems,crystal_system = generate_slip_systems(atoms)
                 schmid_factors = [calculate_schmid_factor(normal, direction, strain_dir) for normal, direction in slip_systems]
-            #os.system("rm -rf current_structure.vasp")
+
             finite_unique_schmid_factors = set(factor for factor in schmid_factors if np.isfinite(factor))
             formatted_schmid_factors = ", ".join("{:.3f}".format(factor) for factor in finite_unique_schmid_factors)
             chem_formula = atoms.get_chemical_formula(mode='hill',empirical=False)

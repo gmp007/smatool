@@ -1,0 +1,54 @@
+# Strain	Stress (N/m)	Mean Volume (A^3)	Mean Energy(eV)	Mean Pressure (N/m)
+0.0	0.0	0.0	0.0	0.0
+0.010000	2.967270	106.382007	-18.593457	0.135277
+0.015000	4.645295	106.908650	-18.593044	0.202350
+0.020000	6.275792	107.435294	-18.588790	0.266961
+0.030000	9.396213	108.488581	-18.569853	0.389130
+0.040000	12.333547	109.541868	-18.538417	0.502449
+0.050000	15.095218	110.595155	-18.496090	0.607650
+0.060000	17.683598	111.648442	-18.443829	0.704866
+0.070000	20.099482	112.701730	-18.382649	0.794430
+0.080000	22.351228	113.755017	-18.313407	0.876674
+0.090000	24.437013	114.808304	-18.236706	0.951732
+0.100000	26.361043	115.861591	-18.153109	1.019603
+0.110000	28.125276	116.914878	-18.068305	1.091201
+0.120000	29.722821	117.968166	-17.973345	1.147495
+0.130000	31.157413	119.021453	-17.873335	1.197600
+0.140000	32.429113	120.074740	-17.768827	1.241317
+0.150000	33.535279	121.128027	-17.660281	1.278713
+0.160000	34.479289	122.181314	-17.548294	1.309920
+0.170000	35.258414	123.234602	-17.433395	1.334873
+0.180000	35.869210	124.287889	-17.316041	1.353571
+0.190000	36.311375	125.341176	-17.196858	1.365815
+0.200000	36.579826	126.394463	-17.076383	1.371737
+0.210000	36.672462	127.447750	-16.955182	1.371338
+0.220000	36.585018	128.501038	-16.833921	1.364284
+0.230000	36.265956	129.554325	-16.719223	1.352972
+0.240000	35.775470	130.607612	-16.600850	1.332345
+0.250000	35.045141	131.660899	-16.484462	1.303399
+# Energy Storage Capacity at max strain 0.2100 is 5.613 MJ/L or 706.082 Wh/Kg, Thickness 3.43 Å 
+# Estimated Young modulus (E) is 303.360354 N/m
+# Estimated Stiffness constant (E-A) (K) is 4553.567209 N/m
+# Estimated Stiffness constant (P-A) (K) is 300.797413 N/m
+# Estimated Bp (E-A) (K) is 8.246890 
+# Estimated Bp (P-A) (K) is 7.969295 
+# Estimated Yield strength using 0.002 offset is 17.683598 N/m
+# Estimated Shear modulus (G) is 113.881423 N/m
+# Estimated First Lamé parameter (lambda) is 224.876464 N/m
+# Estimated Second Lamé parameter (mu) is 113.881423 N/m
+# Estimated Resilience is 0.154667 J/m^3
+# Estimated Toughness is 1.900344 J/m^3
+# Estimated Ductility(%) is 21.000 %
+# Estimated Ductility Index(%) is 250.000 %
+# Estimated Poisson's ratio (v) is 0.331913 
+# Estimated Grüneisen parameter (gamma) is 1.989395
+# Estimated Longitudinal sound velocity (V_l) is 23.400017 km/s
+# Estimated Shear sound velocity (V_s) is 12.262716 km/s
+# Estimated Mean sound velocity (V_m) is 15.360677 km/s
+# Estimated Pwave velocity (V_p) is 24.447608 km/s
+# Estimated Debye temperature (T_D) is 2562.512494 K
+# Estimated Min thermal Conductivity (Slack) is 5.906943 W/mK
+# Estimated Min thermal  Conductivity (Clarke) is 4.564838 W/mK
+# Estimated Min thermal  Conductivity (Cahill) is 12.701312 W/mK
+# Estimated Integrated min thermal  Conductivity (Slack) is 1.492958 W/mK
+# Tensile_x ultimate strength: 36.672462 N/m

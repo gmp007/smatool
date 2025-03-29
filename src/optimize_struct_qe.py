@@ -17,6 +17,7 @@ import shutil
 import numpy as np
 import copy
 import spglib
+import logging 
 from ase import Atoms, units
 from ase.io import read, write
 from ase.geometry import cell_to_cellpar, cellpar_to_cell
@@ -31,7 +32,7 @@ from ase.units import fs, kB
 from optimize_struct import swap_axes_to_longest_c, remove_spurious_distortion,string_to_tuple
 from shear_tensile_constraint import ShearTensileConstraint
 from read_write import read_and_write_kpoints,read_options_from_input,load_structure,update_qe_object,simplify_formula
-from euler_angles_rotation import calculate_euler_angles, apply_rotation, rotate, rotate_crystal_structure, apply_rotation_2D, rotate_crystal_structure_2D
+from euler_angles_rotation import apply_rotation, rotate, rotate_crystal_structure, apply_rotation_2D, rotate_crystal_structure_2D
 from euler_angles_rotation import calculate_schmid_factor, generate_slip_systems_2d_hexagonal, generate_slip_systems
 from modify_incar import ChangeDir,WildCard
 from pathlib import Path
@@ -39,7 +40,12 @@ import json
 
 options = read_options_from_input()
 slipon = options.get("slipon",False)
-checkrotation = options.get("rotation",False)
+checkrotation = options.get("rotation", False)
+#if slipon:
+#    rotation = True
+#    checkrotation = rotation
+#else:
+#    checkrotation = options.get("rotation", False)
 dim = options.get("dimensional", "3D")
 use_saved_data = options.get('use_saved_data', False)
 
@@ -51,23 +57,31 @@ def find_qe_pseudopotentials(atoms, base_path="./potentials"):
 
     pseudopotentials = {}
     unique_symbols = set(atoms.get_chemical_symbols())
+    missing_symbols = []
 
     for symbol in unique_symbols:
         potential_paths = [
             os.path.join(base_path, symbol + "_pdojo.upf"),
+            os.path.join(base_path, symbol + "_pdojo.UPF"),
             os.path.join(base_path, symbol + ".UPF"),
             os.path.join(base_path, symbol + "pz-vbc.UPF"),
+            os.path.join(base_path, symbol + ".pz-vbc.UPF"),
+            os.path.join(base_path, symbol + ".pbe-n-kjpaw_psl.1.0.0.UPF"),
             os.path.join(base_path, symbol + "_sv.UPF"),
             os.path.join(base_path, symbol + ".upf")
         ]
+
 
         pp_file_path = next((path for path in potential_paths if os.path.exists(path)), None)
 
         if not pp_file_path:
             raise Exception(f"Pseudopotential for {symbol} not found in any of the expected directories!")
-
+            logging.error(f"Pseudopotential for {symbol} not found in any of the expected directories!")
+            missing_symbols.append(symbol)
         pseudopotentials[symbol] = os.path.basename(pp_file_path)
 
+    if missing_symbols:
+        raise Exception(f"Pseudopotentials missing for symbols: {', '.join(missing_symbols)}")
 
     return pseudopotentials
 
@@ -88,23 +102,27 @@ def check_optimization_completed(atoms, mode, output_dir="OPT"):
     """
     optimized = False
     output_file = os.path.join(output_dir, "espresso.pwo")
-    structure_file = os.path.join(output_dir, "optimized_structure.traj")  
+    structure_file = os.path.join(output_dir, "optimized_structure.cif")  
 
     if os.path.exists(output_dir):
         if os.path.isfile(output_file):
             with open(output_file, "r") as f:
                 content = f.read()
-                if "End of self-consistent calculation" in content: 
+                if "Final enthalpy" in content: 
                     # Check if optimized structure file exists and matches the initial atoms
                     if os.path.isfile(structure_file):
                         optimized_atoms = read(structure_file)
                         if set(atoms.get_chemical_symbols()) == set(optimized_atoms.get_chemical_symbols()):
                             print("DFT Optimization already completed. Skipping...")
+                            logging.info("DFT Optimization already completed. Skipping...")
                             optimized = True
                         else:
                             print("Structures in final structure file and initial atoms object do not match. Proceeding with optimization...")
+                            logging.info("Structures in final structure file and initial atoms object do not match. Proceeding with optimization...")
+                            
                     else:
                         print("Optimized structure file not found. Proceeding with optimization...")
+                        logging.info("Optimized structure file not found. Proceeding with optimization...")
     else:
         os.mkdir(output_dir)
 
@@ -245,6 +263,8 @@ def optimize_structure_qe(mode, stress_component_list):
 
     with ChangeDir("OPT"):
         qe_parameters = update_qe_object("DFT Optimization", qe_parameters)
+        #print("qe_parameters", qe_parameters)
+        #exit(1)
         atoms.set_calculator(Espresso(**qe_parameters))
         calculator_settings = qe_parameters
         optimized_atoms = atoms.copy()
@@ -271,7 +291,16 @@ def optimize_structure_qe(mode, stress_component_list):
             if dim =="2D":
                 slip_systems = generate_slip_systems_2d_hexagonal()
                 schmid_factors = [calculate_schmid_factor(normal, direction, strain_dir) for normal, direction in slip_systems]
-                crystal_system = spglib.get_spacegroup(atoms,symprec=0.1)
+
+                try:
+                    lattice = atoms.cell.array
+                    positions = atoms.get_scaled_positions()
+                    numbers = atoms.numbers
+                    cell = (lattice, positions, numbers)                   
+                    crystal_system = spglib.get_spacegroup(cell,symprec=0.1)
+                except TypeError:
+                    crystal_system = spglib.get_spacegroup(atoms,symprec=0.1)                   
+                #crystal_system = spglib.get_spacegroup(atoms,symprec=0.1)
             elif dim =="3D":
                 slip_systems,crystal_system = generate_slip_systems(atoms)
                 schmid_factors = [calculate_schmid_factor(normal, direction, strain_dir) for normal, direction in slip_systems]
@@ -310,7 +339,8 @@ def optimize_structure_qe(mode, stress_component_list):
             })
             md_parameters = update_qe_object("MD Nostrain", md_parameters)
 
-            ions_params = md_parameters.get('ions', {})
+            #ions_params = md_parameters.get('ions', {})
+            ions_params = md_parameters['input_data'].get('ions', {})
             temperature_K = ions_params.get('temperature',300)
             dt = ions_params.get('dt', 41.341)  # Default time step
             dt = dt/41.341 #Atomic unit to fs for ASE
@@ -366,6 +396,8 @@ def optimize_structure_qe(mode, stress_component_list):
     os.mkdir(dir_yield)
 
     optimized_atoms = Atoms(symbols=atoms.get_chemical_symbols(), positions=atoms.get_positions(), cell=atoms.get_cell(), pbc=True)
+    structure_file = "OPT/optimized_structure.cif"
+    write(structure_file, optimized_atoms)
     return optimized_atoms
 
 

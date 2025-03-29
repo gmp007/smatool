@@ -1,0 +1,12 @@
+Copied POTCAR for C to potentials/potpaw_PBE/C
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                            Results for Tensile_x                     ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform MD simulations                   ❤
+❤                Calculations started at 23:48:10 on 2024-01-05        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+       Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+LBFGS:    0 23:48:22      -37.075319*       0.0010

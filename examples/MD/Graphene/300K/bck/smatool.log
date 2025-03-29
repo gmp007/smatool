@@ -1,0 +1,54 @@
+2024-06-16 23:31:53 - INFO - SMATool calculation started at 23:31:53 on 2024-06-16
+2024-06-16 23:31:53 - INFO - ==================================
+2024-06-16 23:31:53 - INFO - Input file used in calculation:
+2024-06-16 23:31:53 - INFO - code_type: VASP
+2024-06-16 23:31:53 - INFO - use_saved_data: True
+2024-06-16 23:31:53 - INFO - use_dnn_gan: False
+2024-06-16 23:31:53 - INFO - strains: 0.01 0.8 0.01
+2024-06-16 23:31:53 - INFO - yieldpoint_offset: 0.002
+2024-06-16 23:31:53 - INFO - nlayers: 1
+2024-06-16 23:31:53 - INFO - vdwgap: 3.5
+2024-06-16 23:31:53 - INFO - dimensional: 2D
+2024-06-16 23:31:53 - INFO - mode: MD
+2024-06-16 23:31:53 - INFO - scrystal: cubic
+2024-06-16 23:31:53 - INFO - plusminus: False
+2024-06-16 23:31:53 - INFO - use_schmid_factors: False
+2024-06-16 23:31:53 - INFO - components: ['Tensile_x', 'Shear', 'Tensile_y', 'ideal_strength']
+2024-06-16 23:31:53 - INFO - md_supercell: [2, 2, 1]
+2024-06-16 23:31:53 - INFO - md_timestep: 200.0
+2024-06-16 23:31:53 - INFO - indent_radius: 0.0
+2024-06-16 23:31:53 - INFO - custom_options: {'potential_dir': '/home/chineduekuma/codes/vasp/PBE'}
+2024-06-16 23:31:53 - INFO - job_submit_command: vasp > log
+2024-06-16 23:31:53 - INFO - structure_file: graphene.vasp
+2024-06-16 23:31:53 - INFO - rotation: False
+2024-06-16 23:31:53 - INFO - save_struct: True
+2024-06-16 23:31:53 - INFO - slipon: False
+2024-06-16 23:31:53 - INFO - slip_parameters: 100, 111
+2024-06-16 23:31:53 - INFO - Input parameters from smatool.in ends
+2024-06-16 23:31:53 - INFO - ==================================
+2024-06-16 23:31:57 - ERROR - An error occurred: name 'K_Slack' is not defined
+2024-06-16 23:31:57 - INFO - 
+2024-06-16 23:31:57 - INFO - Results are saved in the various component files
+2024-06-16 23:31:57 - INFO - SMATool general output is in smatool.out
+2024-06-16 23:31:57 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-16 23:31:57 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-16 23:31:57 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-16 23:31:57 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-16 23:31:57 - INFO - Yield strength profile saved in the smatool_plots folder
+2024-06-16 23:31:57 - INFO - 
+2024-06-16 23:31:57 - INFO - Calculation done in 3.13
+2024-06-16 23:31:57 - INFO - Well done! GOOD LUCK!
+2024-06-16 23:31:57 - INFO - SMATool calculation Ended at 23:31:57 on 2024-06-16
+2024-06-16 23:32:00 - ERROR - An error occurred: name 'K_Slack' is not defined
+2024-06-16 23:32:00 - INFO - 
+2024-06-16 23:32:00 - INFO - Results are saved in the various component files
+2024-06-16 23:32:00 - INFO - SMATool general output is in smatool.out
+2024-06-16 23:32:00 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-16 23:32:00 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-16 23:32:00 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-16 23:32:00 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-16 23:32:00 - INFO - Yield strength profile saved in the smatool_plots folder
+2024-06-16 23:32:00 - INFO - 
+2024-06-16 23:32:00 - INFO - Calculation done in 6.47
+2024-06-16 23:32:00 - INFO - Well done! GOOD LUCK!
+2024-06-16 23:32:00 - INFO - SMATool calculation Ended at 23:32:00 on 2024-06-16

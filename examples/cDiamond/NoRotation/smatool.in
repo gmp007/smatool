@@ -31,7 +31,7 @@ slip_parameters = 1-11, 111
 #slipping on; must be on/yes/1 once shear modeling is enabled
 slipon = off
 #potential directory
-potential_dir = potential/
+potential_dir = /home/chineduekuma/codes/vasp/PBE
 
 #potential_dir = /home/chineduekuma/codes/QE/pseudo/
 #Use saved data. postprocessing to obtain yield strength

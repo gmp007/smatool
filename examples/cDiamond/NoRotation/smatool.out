@@ -1,0 +1,144 @@
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                            Results for TENSILE_X                     ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 00:59:33 on 2024-06-09        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++-====================================================================-+
+|                    This is a 3D lattice                              |
++-====================================================================-+
+                             Ultimate strain (ε) = 0.380                             
+                        Ultimate strength (σ_s) = 225.689 GPa                        
+                          Yield Strength (σ_y) = 26.968 GPa                          
+                             Stiffness (E) = 977.534 GPa                             
+                             Thickness of material = None                            
+                            Resilience (U_r) = 0.405 J/m^3                           
+                            Toughness (U_r) = 61.649 J/m^3                           
+                      Energy storage capacity (E_c) = 5.360 MJ/L                     
+                    Energy storage capacity (E_c) = 421.285 Wh/Kg                    
+                              Ductility (%D) = 38.000 %                              
+                          Ductility Index (%DI) = 1166.667 %                         
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+|              SMATool: Strength of materials analysis toolkit,                |
+|                                 C.E. Ekuma,                                  |
+|             Computer Physics Communications 300, 109189, (2024)              |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|          for tensile and indent strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                         Results for TENSILE_BIAXIAL                  ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 00:59:34 on 2024-06-09        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++-====================================================================-+
+|                    This is a 3D lattice                              |
++-====================================================================-+
+                             Ultimate strain (ε) = 0.250                             
+                        Ultimate strength (σ_s) = 106.905 GPa                        
+                          Yield Strength (σ_y) = 45.522 GPa                          
+                             Stiffness (E) = 947.387 GPa                             
+                             Thickness of material = None                            
+                            Resilience (U_r) = 1.138 J/m^3                           
+                            Toughness (U_r) = 23.183 J/m^3                           
+                      Energy storage capacity (E_c) = 1.670 MJ/L                     
+                    Energy storage capacity (E_c) = 131.287 Wh/Kg                    
+                              Ductility (%D) = 25.000 %                              
+                          Ductility Index (%DI) = 400.000 %                          
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+|              SMATool: Strength of materials analysis toolkit,                |
+|                                 C.E. Ekuma,                                  |
+|             Computer Physics Communications 300, 109189, (2024)              |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|          for tensile and indent strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                         Results for INDENT_STRENGTH                  ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 00:59:35 on 2024-06-09        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++-====================================================================-+
+|                    This is a 3D lattice                              |
++-====================================================================-+
+                             Ultimate strain (ε) = 0.390                             
+                        Ultimate strength (σ_s) = 193.100 GPa                        
+                          Yield Strength (σ_y) = 113.518 GPa                         
+                             Stiffness (E) = 573.094 GPa                             
+                             Thickness of material = None                            
+                           Resilience (U_r) = 11.352 J/m^3                           
+                           Toughness (U_r) = 101.311 J/m^3                           
+                      Energy storage capacity (E_c) = 4.707 MJ/L                     
+                    Energy storage capacity (E_c) = 369.937 Wh/Kg                    
+                              Ductility (%D) = 39.000 %                              
+                           Ductility Index (%DI) = 95.000 %                          
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+|              SMATool: Strength of materials analysis toolkit,                |
+|                                 C.E. Ekuma,                                  |
+|             Computer Physics Communications 300, 109189, (2024)              |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|          for tensile and indent strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                              Results for SHEAR                       ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 00:59:35 on 2024-06-09        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++-====================================================================-+
+|                    This is a 3D lattice                              |
++-====================================================================-+
+                             Ultimate strain (ε) = 0.190                             
+                        Ultimate strength (σ_s) = 194.276 GPa                        
+                          Yield Strength (σ_y) = 148.855 GPa                         
+                             Stiffness (E) = 1147.168 GPa                            
+                             Thickness of material = None                            
+                            Resilience (U_r) = 9.676 J/m^3                           
+                            Toughness (U_r) = 26.671 J/m^3                           
+                      Energy storage capacity (E_c) = 2.307 MJ/L                     
+                    Energy storage capacity (E_c) = 181.324 Wh/Kg                    
+                              Ductility (%D) = 19.000 %                              
+                           Ductility Index (%DI) = 46.154 %                          
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+|              SMATool: Strength of materials analysis toolkit,                |
+|                                 C.E. Ekuma,                                  |
+|             Computer Physics Communications 300, 109189, (2024)              |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|          for tensile and indent strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+

@@ -621,13 +621,13 @@ dimensional = 2D
 # strain: start, end, and interval
 strains = 0.01 0.8 0.01
 
-#perform compression with tensile 
+#Choose b/w tensile (off), compressional (compress) or both (on) 
 plusminus = off
 
 #yieldpoint offset, e.g. 0.2%
 yieldpoint_offset = 0.002
 
-#stress components: Tensile_x Tensile_y Tensile_z Tensile_biaxial indent_strength Shear (xz for 1D and 3D and xy for 2D)
+#stress components: Tensile_x Tensile_y Tensile_z Tensile_biaxial indent_strength ideal_strength ideal_strength Shear (xz for 1D and 3D and xy for 2D)
 # you can writ more than one case by just listing them (no comma, just space)  
 components = Tensile_x
 
@@ -640,14 +640,14 @@ save_struct = on
 #molecular dynamics time step
 md_timestep = 500
 
-#apply rotation along strain (plane) and slip directions
-rotation = off
+#slipping on; must be on/yes/1 to model slip system along strain (plane) and slip directions
+slipon = off
 
-#define strain direction, uses Miller indices, e.g., 11, 0-1 for 2D
+#define strain (plane) and slip directions, uses Miller indices, e.g., 11, 0-1 for 2D
 slip_parameters = 100, 111
 
-#slipping on; must be on/yes/1 once shear modeling is enabled
-slipon = off
+#define indentation radius in unit of your cell. Only needed when performing indentation strength
+indent_radius = 2.0
 
 #explicit potential directory
 potential_dir = /potential/
@@ -700,16 +700,20 @@ def print_default_input_message_1():
 
 max_width = len("|WARNING: This is an empirical approx; validity needs to be checked !! |")
 
-def print_line(content, padding=1, border_char="|", filler_char=" "):
+def print_line(ec_file,content, padding=1, border_char="|", filler_char=" "):
     content_width = int(max_width) - (2 * int(padding)) - 2  # Subtract 2 for the border characters
     content = content[:content_width]  # Ensure content doesn't exceed the width
     line = border_char + filler_char*padding + content.ljust(content_width) + filler_char*padding + border_char
-    print(line)  # Print the line to the console
-    
+    #print(line)  # Print the line to the console
+    if ec_file:
+        ec_file.write(line + "\n")
+    else:
+        print(line)    
 
-from datetime import datetime
+        
+        
 
-def print_banner2(yield_file, elapsed_time,filename_struct=None):
+def print_banner2(yield_file, elapsed_time,ec_file=None, filename_struct=None):
     current_time = datetime.now().strftime('%H:%M:%S')
     current_date = datetime.now().strftime('%Y-%m-%d')
     
@@ -723,45 +727,29 @@ def print_banner2(yield_file, elapsed_time,filename_struct=None):
 
     message = f"{result_msg}\n{finish_msg}"
 
-    print_line('❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
+    print_line(ec_file,'❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
     for line in message.split('\n'):
         centered_line = line.center(max_width - 4)
-        print_line(centered_line, padding=1, border_char='❤')
-    print_line('❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
-
-# Assume print_line and max_width are defined elsewhere in your code
+        print_line(ec_file,centered_line, padding=1, border_char='❤')
+    print_line(ec_file,'❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
 
 
-
-#def print_banner2(filename_struct, yield_file, elapsed_time):
-#    current_time = datetime.now().strftime('%H:%M:%S')
-#    current_date = datetime.now().strftime('%Y-%m-%d')
-#    result_msg = f"Results are written in {filename_struct}\nand structure information\nat each stress and strain saved\nin {yield_file}."
-#    finish_msg = f"Job finished at {current_time} on {current_date} using {elapsed_time:.2f} s"
-
-#    message = f"{result_msg}\n{finish_msg}"
-
-#    print_line('❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
-#    for line in message.split('\n'):
-#        centered_line = line.center(max_width - 4)
-#        print_line(centered_line, padding=1, border_char='❤')
-#    print_line('❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
-
-
-def print_banner(version,component,code_type,method):
+def print_banner(version,component,code_type,method,ec_file=None):
     current_time = datetime.now().strftime('%H:%M:%S')
     current_date = datetime.now().strftime('%Y-%m-%d')
     conclusion_msg = f"Calculations started at {current_time} on {current_date}"
+    component = component.upper() 
 
     message = f"Results for {component}\nusing\nSMATool Version: {version}\n {code_type} code is used as a calculator\nto perform {method} simulations\n{conclusion_msg}"
 
     max_width = 80  # Define the maximum width for the banner
 
-    print_line('❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
+    print_line(ec_file,'❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
     for line in message.split('\n'):
         centered_line = line.center(max_width - 4)
-        print_line(centered_line, padding=1, border_char='❤')
-    print_line('❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
+        print_line(ec_file,centered_line, padding=1, border_char='❤')
+    print_line(ec_file,'❤' * (max_width - 2), padding=0, border_char='❤', filler_char='❤')
+
 
 
 
@@ -774,9 +762,9 @@ def print_boxed_message(ec_file=None):
         (" * CITATIONS *", True),
         ("If you have used SMATool in your research, PLEASE cite:", False),
         ("", False),  # Space after the above line
-        ("SMATool: An automated toolkit for strengths of materials, ", False),
-        ("C.E. Ekuma and Z.-L. Liu, ", False),
-        ("Computer Physics Communications xxx, xxx, (2024)", False),
+        ("SMATool: Strength of materials analysis toolkit, ", False),
+        ("C.E. Ekuma, ", False),
+        ("Computer Physics Communications 300, 109189, (2024)", False),
         ("", False),
 
         ("", False),  # Blank line for separation

@@ -17,21 +17,24 @@ import shutil
 import numpy as np
 import pandas as pd
 import matplotlib
+import logging
 import time
 import copy
+from math import pi, sqrt,exp
+from numpy import cross, linalg,log, expm1
 from datetime import datetime
 import warnings
-from read_write import read_options_from_input,load_structure #, write_incar, read_incars, read_and_write_kpoints,,convert_cif_to_vasp,modify_incar_and_restart
+from read_write import read_options_from_input,load_structure,validate_options,validate_active_components #, write_incar, read_incars, read_and_write_kpoints,,convert_cif_to_vasp,modify_incar_and_restart
 from optimize_struct import optimize_structure
 from calculate_stress import calculate_stress_for_strain
 from calculate_stress_qe import calculate_stress_for_strain_qe
 from process_struct import save_contcar_data, get_contcar_data,get_contcar_data_from_qe, save_contcar_data_qe
-from process_stress import get_yield_strength_offset,get_yield_strength_linearity
+from process_stress import calculate_yield_strength,calculate_bulk_modulus,calculate_bulk_modulus2
 from optimize_struct_qe import optimize_structure_qe
 from stress_read_write import save_stress_data, read_stress_data, read_stress_data_2nd, wildcard_output,wildcard_output_qe
-from write_inputs import print_boxed_message, print_banner, print_banner2, print_boxed_message
+from write_inputs import print_line, print_boxed_message, print_banner, print_banner2
 from elastic_energydensity import predict_thickness_2D,calculate_energy_densities 
-
+from thermocalc import ThermalConductivityCalculator
 
 try:
     from importlib.metadata import version  # Python 3.8+
@@ -43,26 +46,65 @@ except ImportError:
     import pkg_resources
     version = pkg_resources.get_distribution("SMATool").version
 
-
 warnings.filterwarnings('ignore')
 matplotlib.use('Agg')
 
+log_filename = 'smatool.log'
+if os.path.exists(log_filename):
+    os.remove(log_filename)
+
+logging.basicConfig(
+    filename=log_filename,
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.INFO
+)
 
 # Main code starts here!
+
 current_time = datetime.now().strftime('%H:%M:%S')
 current_date = datetime.now().strftime('%Y-%m-%d')
 start_time = time.time()
 
+logging.info(f"SMATool calculation started at {current_time} on {current_date}")
+
 options = read_options_from_input()
+#if options.get("slipon",False):
+#    rotation = True
+
 code_type = options.get("code_type", "VASP")
 strain_range = options.get('strains', '0.0 0.6 0.01')  # Default to [start, end, interval] 
 do_compress = options.get('plusminus',False)
+
 offset = options.get("yieldpoint_offset",0.002)
 mode = options.get('mode', "DFT")
 active_components = options.get('components','xx')
 dim = options.get('dimensional','2D')
 use_saved_data = options.get('use_saved_data', False)
 save_struct = options.get('save_struct', True)
+
+valid_options = {
+    "code_type": ["VASP", "QE"],
+    "mode": ["DFT", "MD"],
+    "dimensional": ["1D", "2D", "3D"]
+}
+
+valid_components = ["Tensile_x", "Tensile_y", "Tensile_z", "Tensile_biaxial", "Shear", "indent_strength","ideal_strength"]
+
+errors = validate_options(options, valid_options)
+if errors:
+    for error in errors:
+        print(error)
+    exit(1)
+
+logging.info("==================================")
+logging.info("Input file used in calculation:")
+for key, value in options.items():
+    logging.info(f"{key}: {value}")
+logging.info("Input parameters from smatool.in ends")       
+logging.info("==================================")
+        
 if code_type == "VASP":
 
     custom_options = options['custom_options']
@@ -78,62 +120,85 @@ if code_type == "VASP":
     # Prepare potential directories
     potentials_path = "potentials"
     for symbol in unique_symbols:
-        # Determine the potential directory for the current element
-        potential_dir = os.path.join(potentials_path, "potpaw_PBE", symbol)
+        # Check the potential file path
+        potential_potcar_paths = [
+            os.path.join(base_path, symbol, "POTCAR"),
+            os.path.join(base_path, symbol + "_pv", "POTCAR"),
+            os.path.join(base_path, symbol + "_sv", "POTCAR"),
+            os.path.join(base_path, symbol + "_GW", "POTCAR"),
+            os.path.join(base_path, symbol + "_sv_GW", "POTCAR"),
+            os.path.join(base_path, symbol + "_pv_GW", "POTCAR")
+            
+        ]
+
+        pot_file_path = next((path for path in potential_potcar_paths if os.path.exists(path)), None)
+        if not pot_file_path:
+            raise Exception(f"POTCAR for {symbol} not found in any of the expected directories!")
+            logging.error(f"POTCAR for {symbol} not found in any of the expected directories!")
+
+        suffix = os.path.basename(os.path.dirname(pot_file_path)) 
+        potential_dir = os.path.join(potentials_path, "potpaw_PBE", suffix)
         
         if os.path.exists(potential_dir):
             shutil.rmtree(potential_dir)
             
         os.makedirs(potential_dir, exist_ok=True)
 
-        
-        # Check the potential file path
-        potential_potcar_paths = [
-            os.path.join(base_path, symbol, "POTCAR"),
-            os.path.join(base_path, symbol + "_pv", "POTCAR"),
-            os.path.join(base_path, symbol + "_sv", "POTCAR")
-        ]
-
-        pot_file_path = next((path for path in potential_potcar_paths if os.path.exists(path)), None)
-        if not pot_file_path:
-            raise Exception(f"POTCAR for {symbol} not found in any of the expected directories!")
-        
-        # Copy the POTCAR for the current symbol to the correct directory
         shutil.copy(pot_file_path, potential_dir)
-        print(f"Copied POTCAR for {symbol} to {potential_dir}")
+        #print(f"Copied POTCAR for {symbol} to {potential_dir}")
+
+destination_folder = 'smatool_plots'
+if not os.path.exists(destination_folder):
+    #shutil.rmtree(destination_folder)
+    os.makedirs(destination_folder)
+
+filename_smatool = 'smatool.out'
+if os.path.exists(filename_smatool):
+    os.remove(filename_smatool)
 
 
-for component in active_components:
+# Define some constants
+h = 6.626E-34
+hbar = 1.0546E-34
+k = 1.381E-23
+Na = 6.023E+23
+start_thermal = 10; interval_thermal = 10; end_thermal = 2000
+
+    
+for component in active_components: 
+    # Validate active components
+    errors = validate_active_components(active_components, valid_components)
+    if errors:
+        for error in errors:
+            print(error)
+        exit(1)
     print_banner(version,component,code_type, mode)
     start, end, interval = map(float, strain_range.split())
     
-    # Determine the interval for the first five points
     finer_interval = interval / 2
 
-    # Generate the first five points with finer interval
     finer_strains = [start + i * finer_interval for i in range(2)]
 
-    # Generate the remaining points with the regular interval
     regular_strains_start = start + 2 * finer_interval
     regular_strains = [regular_strains_start + i * interval for i in range(int((end - regular_strains_start) / interval) + 1)]
 
-    # Combine finer and regular strains
     strains = finer_strains + regular_strains
     
+    if do_compress == "on":
+        #strains = [-x for x in reversed(strains)] + strains[1:]
+        negative_side = [-x for x in reversed(strains)]
+        strains = negative_side + [0.0] + strains
 
-    if do_compress:
-        strains = [-x for x in reversed(strains)] + strains[1:]
 
-
+    if do_compress == "compress":
+        strains = [-x for x in strains]   
+   
     strains = [x for x in strains if x != 0.0]
-
-
     consecutive_negative_stresses = 0
     consecutive_decreasing_stresses = 0 
     previous_stress = None
     filename = f"{mode}_ys2dstress_{component}.out"
 
-    
     if use_saved_data:
         stressstrain_data = f"{mode}_{component}_strength.dat"
         try:
@@ -145,6 +210,19 @@ for component in active_components:
         except ImportError:
             struct = options.get("structure_file")
             atoms = load_structure(struct)
+        orig_volume = atoms.get_volume()
+
+        if dim =="2D":
+            cell = atoms.get_cell()
+            orig_volume = np.linalg.norm(np.cross(cell[0], cell[1])) 
+            lz_angstrom = atoms.cell.cellpar()
+            lz_angstrom = lz_angstrom[2]
+            c_length = lz_angstrom/100 
+        else:
+            c_length = 1.0
+            lz_angstrom = 1.0
+            
+   
     else:
         strengthfile = f"{mode}_{component}_strength.dat"
         yield_file = open(strengthfile, "w")
@@ -153,16 +231,22 @@ for component in active_components:
             atoms = optimize_structure(mode=mode,stress_component_list=component)  # The optimized atoms replaces the original atoms
         elif code_type == "QE":
             atoms = optimize_structure_qe(mode=mode, stress_component_list=component)
- 
 
         original_atoms = copy.deepcopy(atoms)  # Store a copy of the optimized structure
+        orig_volume = original_atoms.get_volume()
+
     
         if dim =="2D":
-            lz_angstrom = original_atoms.cell.cellpar()
-            c_length = lz_angstrom[2]/100 
+            cell = atoms.get_cell()
+            orig_volume = np.linalg.norm(np.cross(cell[0], cell[1])) 
+            lz_angstrom = atoms.cell.cellpar()
+            lz_angstrom = lz_angstrom[2]
+            c_length = lz_angstrom/100 
         else:
             c_length = 1.0
-    
+            lz_angstrom = 1.0
+
+                         
         print(f"Calculating for {component} component.")
 
         if mode == "MD":
@@ -170,15 +254,15 @@ for component in active_components:
                 yield_file.write("# Strain\tStress (N/m)\tMean Volume (A^3)\tMean Energy(eV)\tMean Temperature (K)\tMean Pressure (N/m)\n")
             else:
                 yield_file.write("# Strain\tStress (GPa)\tMean Volume (A^3)\tMean Energy(eV)\tMean Temperature (K)\tMean Pressure (GPa)\n")
-            yield_file.write("0.0\t0.0\t0.0\t0.0\t0.0\t0.0 \n")
+            if not do_compress =="off":
+                yield_file.write("0.0\t0.0\t0.0\t0.0\t0.0\t0.0 \n")
         elif mode == "DFT":
             if dim =="2D":
                 yield_file.write("# Strain\tStress(N/m) \tMean Volume (A^3)\tMean Energy(eV)\tMean Pressure (N/m) \n")
             else:
                 yield_file.write("# Strain\tStress(GPa) \tMean Volume (A^3)\tMean Energy(eV)\tMean Pressure (GPa) \n")
-            yield_file.write("0.0\t0.0\t0.0\t0.0\t0.0    \n")
-        
-        
+            if not do_compress =="off":
+                yield_file.write("0.0\t0.0\t0.0\t0.0\t0.0    \n")
         
         # Check if file exists
         if os.path.exists(filename):
@@ -205,7 +289,8 @@ for component in active_components:
         mean_temp_list = []
         mean_ener_list = []
         mean_press_list = []
-        
+        #vol_area_strain_list = []
+        logging.info(f"Active component is: {component}")
         for strain in strains:
             #print(f"\nStarting calculations for strain {strain} at {current_time } on {current_date}")
             atoms = copy.deepcopy(original_atoms)  # Load the original structure for each strain
@@ -220,15 +305,20 @@ for component in active_components:
                 else:
                     print("Electronic structure code type not yet implemented ")
                     exit(0)
-                if do_compress and strain <0:
+                
+                    
+                if do_compress =="on" and strain <0:
                     stress = -stress
                 if strain <= 0.02 and stress < 0:
-                    stress = abs(0.0) #For small energy cut, small strain can give negative stress!
+                    stress = abs(stress) #For small energy cut, small strain can give negative stress!
                 
                 if code_type == "VASP":
                     temp, vol, ener, press = wildcard_output(outcar_file="Yield/OUTCAR", vasprun_file="Yield/vasprun.xml", num_last_samples=3)
+                    #vol_area_strain = (orig_volume-vol)/orig_volume
                 elif code_type == "QE":
                     temp, vol, ener, press = wildcard_output_qe(pw_out_file="Yield/espresso.pwo", num_last_samples=3)
+                    #vol_area_strain = (orig_volume-vol*lz_angstrom)/orig_volume
+               
                     if temp is None or temp==0:
                         temp = temp_ase
                 if temp is None:
@@ -239,9 +329,27 @@ for component in active_components:
                     press = None
                 if mode=="MD":
                     mean_temp_list.append(temp)
+
                 mean_vol_list.append(vol)
                 mean_press_list.append(press)
                 mean_ener_list.append(ener)
+                #vol_area_strain_list.append(vol_area_strain)
+
+                
+
+
+                # Ensure values are floats before formatting
+                try:
+                    strain = float(strain)
+                    stress = float(stress)
+                    vol = float(vol)
+                    ener = float(ener)
+                    temp = float(temp)
+                    press = float(press)
+                except (ValueError, TypeError) as e:
+                    print(f"Error: Non-float value encountered: {e}")
+
+
                 if mode == "MD":
                     yield_file.write(f"{strain:.6f}\t{stress:.6f}\t{vol:.6f}\t{ener:.6f}\t{temp:.6f}\t{press:.6f}\n")
                 elif mode == "DFT":
@@ -258,7 +366,7 @@ for component in active_components:
                     
                 previous_stress = stress
 
-                if consecutive_decreasing_stresses >= 5 and not do_compress:
+                if consecutive_decreasing_stresses >= 5: # and not do_compress:
                     print("Encountered 5 consecutive decreasing stress values. Exiting calculations.")
                     break 
     
@@ -268,12 +376,13 @@ for component in active_components:
                 else:
                     consecutive_negative_stresses = 0  # Reset the counter if stress is positive
 
-                if consecutive_negative_stresses >= 2 and not do_compress:
+                if consecutive_negative_stresses >= 2: # and not do_compress:
                     print("Encountered consecutive negative stress values. Exiting calculations.")
                     break  
                 yield_file.flush()
                 stresses.append(stress)
                 print(f"Strain: {strain: .4f}, Stress: {stress: .4f}")
+                logging.info(f"Strain: {strain: .4f}, Stress: {stress: .4f}")
 
 
                 if save_struct:
@@ -286,11 +395,9 @@ for component in active_components:
                     
                 #print(f"Finished calculations for strain  {strain} at {current_time } on {current_date} ")
 
-
-
-
             except Exception as e:
                 print(f"Error during calculation at strain {strain}: {e}")
+                logging.error(f"Error during calculation at strain {strain}: {e}")
                 stresses.append(None)
                 mean_vol_list.append(None)
                 mean_temp_list.append(None)
@@ -301,60 +408,297 @@ for component in active_components:
             save_stress_data(filename, component, mode, strains, stresses, mean_vol_list, mean_ener_list,mean_press_list, None)
         elif mode == "MD":
             save_stress_data(filename, component, mode, strains, stresses, mean_vol_list, mean_ener_list, mean_press_list,mean_temp_list)
-
-#    if mode == "DFT":
-#        strains, stresses, mean_vol_list, mean_ener_list, mean_press_list  = read_stress_data_vasp(filename, component)
-#    elif mode =="MD":
-#        strains, stresses, mean_vol_list, mean_ener_list, mean_press_list, mean_temp_list  = read_stress_data_vasp(filename, component)
             
     try:
         results = read_stress_data(filename, component, code_type, mode)
     except Exception:
         results = read_stress_data_2nd(stressstrain_data)
+
     strains = results["strains"]
     stresses = results["stresses"]
     mean_vol_list = results["volumes"]
     mean_ener_list = results["energies"]
     mean_press_list = results["pressures"]
     mean_temp_list = results["temps"]
-    
-                                    
-    # Convert strains and stresses to numpy arrays, excluding the zero strain point
-    strains_array = np.array([s for i, s in enumerate(strains) if strains[i] != 0])
-    stresses_array = np.array([stresses[i] for i, s in enumerate(strains) if strains[i] != 0])
-    
-    yieldstrength = get_yield_strength_offset(stresses_array, strains_array,offset=offset)
-    yieldstrength_linearity = get_yield_strength_linearity(strains_array, stresses_array)
-    #print("yieldstrength  ", yieldstrength)
-    max_stress = max(filter(lambda x: x is not None, stresses))
-    max_stress_index = stresses.index(max_stress)
-    
-    max_strain = strains[max_stress_index]
-    #max_energy = mean_ener_list[max_stress_index]
-    thickness_2D = 0.0
-    if dim=="2D":
-        thickness_2D = predict_thickness_2D(atoms, os.getcwd())
-    energy_density_MJ_L, energy_density_Wh_kg = calculate_energy_densities(max_strain, max_stress, atoms, dim, thickness_2D)
-    if isinstance(energy_density_MJ_L, np.ndarray):
-        energy_density_MJ_L = energy_density_MJ_L[0]  
 
-    if isinstance(thickness_2D, np.ndarray):
-        thickness_2D = thickness_2D[0] 
+    
+    try:
+        min_length = min(len(stresses), len(strains))
+        mean_ener_list = mean_ener_list[:min_length]
+        mean_vol_list = mean_vol_list[:min_length]
+        stresses = stresses[:min_length]
+        strains = strains[:min_length]  
+        mean_temp_list = mean_temp_list[:min_length]
+        mean_press_list = mean_press_list[:min_length]
         
-    if isinstance(energy_density_Wh_kg, np.ndarray):
-        energy_density_Wh_kg = energy_density_Wh_kg[0]  
+
+        strains_array = np.array([s for i, s in enumerate(strains) if strains[i] != 0])
+        stresses_array = np.array([stresses[i] for i, s in enumerate(strains) if strains[i] != 0])
+
+        df_pressure = pd.DataFrame({
+            'Volume': mean_vol_list,
+            'Pressure': stresses,
+            'Energy': mean_ener_list
+        })
+        df_pressure = df_pressure.iloc[1:]
+        
+        df_pressure['Volume'] = df_pressure['Volume']/lz_angstrom
+        df_pressure['Delta_V'] = df_pressure['Volume'] - orig_volume
+      
+        # Calculate dP/dV (or dP/dA) using numerical differentiation
+        dP_dV = np.gradient(df_pressure['Pressure'], df_pressure['Volume'])
+
+        # Calculate the Bulk Modulus/Stiffness Constant K
+        df_pressure['Bulk_Modulus'] = -df_pressure['Volume'] * dP_dV
+        
+        # Calculate the derivative of Bulk Modulus with respect to pressure (K')
+        dK_dP = np.gradient(df_pressure['Bulk_Modulus'], df_pressure['Pressure'])
+
+        df_pressure['Bp'] = dK_dP
+
+        #print(df_pressure[['Volume', 'Pressure', 'Bulk_Modulus','Bp']])
+        filename = f"pressure_derivative_{mode}_{component}.dat"
+        with open(filename, 'w') as file:
+            if dim == "2D":
+                file.write("#Area  (Å²)\tStiffness_Const (N/m)\tBp\tStress (N/m)\n")
+            else:
+                file.write("#Volume (Å³)\tBulk_Modulus (GPa)\tBp\tStress (GPa)\n")
+            for index, row in df_pressure.iterrows():
+                file.write(f"{row['Volume']:.4f}\t{row['Bulk_Modulus']:.4f}\t{row['Bp']:.4f}\t{row['Pressure']:.4f}\n")
+                            
+
+            
+        plotname = f"eos_{mode}_{component}"
+        bulk_modulus,Bp = calculate_bulk_modulus(df_pressure['Volume'],df_pressure['Energy'], df_pressure['Pressure'], plotname,dim)
+        
+        
+        if dim =="2D":
+            plotname = f"K_{mode}_{component}"
+        else:
+            plotname = f"B_{mode}_{component}"
+            
+        bulk_modulus2,Bp2 = calculate_bulk_modulus2(df_pressure['Volume'], df_pressure['Pressure'], plotname,dim)
+        
+        
+        bulk_modulus = bulk_modulus if bulk_modulus is not None and bulk_modulus >= 0 else 0
+        Bp = Bp if Bp is not None and Bp >= 0 else 0
+        Bp2 = Bp2 if Bp2 is not None and Bp2 >= 0 else 0
+        bulk_modulus2 = bulk_modulus2 if bulk_modulus2 is not None and bulk_modulus2 >= 0 else 0
+
+
+        #print("bulk_modulus ", bulk_modulus,Bp,bulk_modulus2)
+                
+        if use_saved_data and not list(filter(lambda x: x is not None, stresses)):
+            print("You do not have any stress component to perform post-processing.\nRerun with 'use_saved_data = False' to generate data") 
+            logging.error("You do not have any stress component to perform post-processing.\nRerun with use_saved_data = False to generate data") 
+            exit(0)
+        max_stress = max(filter(lambda x: x is not None, stresses))
+        max_stress_index = stresses.index(max_stress)
+        
+        max_strain = strains[max_stress_index]
+        #max_energy = mean_ener_list[max_stress_index]
+        thickness_2D = 0.0
+        if dim=="2D":
+            thickness_2D = predict_thickness_2D(atoms, os.getcwd())
+            
+        if isinstance(thickness_2D, np.ndarray):
+            thickness_2D = thickness_2D[0] 
+
+        if isinstance(thickness_2D, np.ndarray) and thickness_2D.size == 1:
+            thickness_2D = thickness_2D.item()
+            
+        energy_density_MJ_L, energy_density_Wh_kg = calculate_energy_densities(max_strain, max_stress, atoms, dim, thickness_2D)
+        if isinstance(energy_density_MJ_L, np.ndarray):
+            energy_density_MJ_L = energy_density_MJ_L[0]  
+
+
+        if isinstance(energy_density_Wh_kg, np.ndarray):
+            energy_density_Wh_kg = energy_density_Wh_kg[0]  
+        
+        filename_ys = f"yield_strength_{mode}_{component}"
+ 
+        #yield_strength = calculate_yield_strength(strains, stresses,dim,thickness_2D,offset,filename_ys)
+
+        try:
+            yield_strength = calculate_yield_strength(strains, stresses, dim, thickness_2D, offset, filename_ys)
+        except Exception as e:
+            print(f"An error occurred during yield strength calculation: {e}")
+            logging.error(f"An error occurred during yield strength calculation: {e}")
+            # Define yield_strength with default None values to prevent NameError
+            yield_strength = [None, None, None, None, None, None]
+
+        filename_workhardening = f"{mode}_{component}_work_hardening_rate.dat" 
+        yield_strength[4].to_csv(filename_workhardening, sep='\t', index=False)
+        
+        ductility = max_strain*1.0E2
+        ductility_index =  1.0E2*(max_strain - yield_strength[5])/yield_strength[5]
+        box_width = 85 #len("|WARNING: This is an empirical approx; validity needs to be checked !! |")
+
+        # Calculate Pressure, and then Enthalpy
+        min_length = min(len(mean_ener_list), len(mean_vol_list))
+        mean_ener_list = mean_ener_list[:min_length]
+        mean_vol_list = mean_vol_list[:min_length]
+        
+
+
+        volume = atoms.get_volume()
+        # The total mass of all atoms in the material, in AMU
+        M = sum(atoms.get_masses())
+        # The number of atoms in the system (material)
+        n = atoms.get_global_number_of_atoms()
+        total_mass = M * 1E-3 / Na
+        cell = atoms.get_cell()
+
+        B = bulk_modulus2
+        E = yield_strength[0]
+        v = (3.*B- E)/6./B
+        
+        if dim =="2D":
+            G = E / 2.0 / (1 + v)  
+
+            area = linalg.norm(cross(cell[0], cell[1]))
+            
+            volume = area*1E-20 # Note this is the area not volume
+            rho = M * 1E-3 / Na / area / 1E-20
+            V_l = 1E-3 * sqrt(abs(B + G) / rho)*np.sign(B+G)
+            V_s = 1E-3 * sqrt(abs(G) / rho)*np.sign(G)
+            V_p = 1E-3 * (B + 4. * G / 3.)**0.5 * (1. / rho )**0.5
+            
+            gamma = 3.*(1.+v)/(2.-3.*v)/2.
+            lame1 = v * E/((1.+ v)*(1.-2.*v))
+            lame2 = E/2./(1.+v)
+
+            V_m = (1.0 / 2.0 * (1.0 / V_s**2.0 + 1 / V_l**2.0))**(-1.0 / 2.0) 
+            T_D = (hbar / k) * (4. * pi * n / area / 1E-20)**(1. / 2.) * V_m * 1E+3
+            
+            thickness = thickness_2D*1E-10
+            #volume = volume*1E-20
+            delta_atoms = volume**(1./2.)/n
+            E_ = E
+        else:
+        
+            rho = M * 1E-3 / Na / volume / 1E-30
+
+            G = E/(2.*(1.+v))
+            
+            lame1 = v * E/((1.+ v)*(1.-2.*v))
+            lame2 = E/2./(1.+v)
+            gamma = 3.*(1.+v)/(2.-3.*v)/2.
+                    
+            V_s = 1E-3 * G**0.5 * \
+                (1E+9 / rho)**0.5
+            V_l = 1E-3 * B**0.5 * \
+                (1E+9 / rho )**0.5
+            V_p = 1E-3 * (B + 4. * G / 3.)**0.5 * (1E+9 / rho )**0.5
+            V_m = ((2. / V_s**3. + 1. / V_p**3) / 3.)**(-1. / 3.)
+            T_D = (h / k) * (3. * n / 4. / pi * Na * rho / M / 1E-3)**(1. / 3.) * V_m * 1E+3
+
+
+            volume = volume*1E-30
+            thickness  = np.linalg.norm(cell[2]) * 1E-10
+            delta_atoms = volume**(1./3.)/n
+            E_ = E*1E+9
+            
+
+        if T_D > end_thermal:
+            end_thermal = T_D +200  
+
+        t_c = V_m*1.E3/thickness
+                    
+
+        thermalcalculator = ThermalConductivityCalculator(dim)
+        
+         
+        KSlack = thermalcalculator.slack_simple_model(M/n, T_D, delta_atoms, gamma, n, 300) 
+        KClarke = thermalcalculator.clarke_model(n,E_,rho, total_mass)  
+
+        KCahill =  thermalcalculator.cahill_thermal_conductivity(n,volume,V_p*1E+3, V_s*1E+3, V_l*1E+3) 
+
+        KSlack_int = thermalcalculator.slack_low_temp(V_m*1E3, T_D,T=300,t_c=t_c)
+
+
+        
+        temp, cond,cond_slack_simple, cond_cahill, capacities, entropy,debye_entropy,free_energy,mpf = thermalcalculator.compute_thermal_conductivity_over_temperature_range(V_m*1E3, T_D, M, \
+                                                                                                  delta_atoms, gamma, n, volume, start_thermal, interval_thermal, end_thermal,rho, t_c)
+                                                                                                  
+                                                                                                              
+        filename =  f"thermodata_{mode}_{component}.dat"
+        data = np.column_stack((temp, cond,cond_slack_simple, cond_cahill, capacities,entropy,debye_entropy, free_energy,mpf))
+        np.savetxt(filename, data, fmt='%.4f', delimiter=' ', \
+        header='#T(K), Kl_SlackLow(W/mK),  Kl_SlackSim(W/mK), Kl_CahillLow(W/mK), Cv(J/molK), S(J/molK), S_Debye(J/molK), H(eV), mpf(µm)', comments='')
+        
+        if dim == "2D":
+            cell = atoms.get_cell()
+            area = np.linalg.norm(np.cross(cell[0], cell[1]))
+            pressr = -np.gradient(mean_ener_list, area)  #surface_tension in N/m
+            enthalpy = mean_ener_list + pressr * area
+        else:
+            if np.all(np.diff(mean_vol_list) == 0):
+                print("Volume is constant. Gradient not possible for enthalpy calculation.")
+                pressr_ = np.zeros_like(mean_ener_list)
+            else:
+                pressr_ = -np.gradient(mean_ener_list, mean_vol_list)
+            pressr = pressr_ * 1.602E-19/1.0E-30 * 1.0E-9 # in GPa
+            enthalpy = mean_ener_list + pressr_ * mean_vol_list
+            
+        filename_enthalpy = f"enthalpy_{mode}_{component}.dat"
+        with open(filename_enthalpy, 'w') as file:
+            if dim == "2D":
+                file.write("#SurfaceTension (N/m)\tEnthalpy(eV)\tStrain\tStress(N/m)\n") 
+            else:
+                file.write("#InternalPressure(GPa)\tEnthalpy(eV)\tStrain\tStress(GPa)\n")
+            for pres, enth,strain,stress in zip(pressr, enthalpy,strains,stresses): 
+                file.write(f"{pres}\t{enth}\t{strain}\t{stress}\n")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        logging.error(f"An error occurred: {e}")
 
 
     if not use_saved_data:
     
-        if yieldstrength is not None:
-            yield_file.write(f"# Energy Storage Capacity at max strain {max_strain} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg, Thickness {thickness_2D} Ang \n")
+        if yield_strength[1] is not None:
+            #yield_file.write(f"# Energy Storage Capacity at max strain {max_strain:.4f} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg, Thickness {thickness_2D} Å \n")
             if dim =="2D":
-                yield_file.write(f"# Estimated yield strength: {yieldstrength:.6f} N/m\n")
-                yield_file.write(f"# Estimated yield strength using linearity method: {yieldstrength_linearity[0]:.6f} N/m")
+                yield_file.write(f"# Energy Storage Capacity at max strain {max_strain:.4f} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg, Thickness {thickness_2D} Å \n")
+                yield_file.write(f"# Estimated Young modulus (E) is {yield_strength[0]:.6f} N/m\n")
+                yield_file.write(f"# Estimated Stiffness constant (E-A) (K) is {bulk_modulus:.6f} N/m\n")
+                yield_file.write(f"# Estimated Stiffness constant (P-A) (K) is {bulk_modulus2:.6f} N/m\n")
+                yield_file.write(f"# Estimated Bp (E-A) (K) is {Bp:.6f} \n")
+                yield_file.write(f"# Estimated Bp (P-A) (K) is {Bp2:.6f} \n")
+                yield_file.write(f"# Estimated Yield strength using {offset} offset is {yield_strength[1]:.6f} N/m\n")
+                yield_file.write(f"# Estimated Shear modulus (G) is {G:.6f} N/m\n")
+                yield_file.write(f"# Estimated First Lamé parameter (lambda) is {lame1:.6f} N/m\n")
+                yield_file.write(f"# Estimated Second Lamé parameter (mu) is {lame2:.6f} N/m\n")
             else:
-                yield_file.write(f"# Estimated yield strength: {yieldstrength:.6f} GPa\n")
-                yield_file.write(f"# Estimated yield strength using linearity method: {yieldstrength_linearity[0]:.6f} GPa ")
+                yield_file.write(f"# Energy Storage Capacity at max strain {max_strain:.4f} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg \n")
+                yield_file.write(f"# Estimated Young modulus (E) is {yield_strength[0]:.6f} GPa\n")
+                yield_file.write(f"# Estimated Bulk modulus (K) (E-V) is {bulk_modulus:.6f} GPa\n")
+                yield_file.write(f"# Estimated Bulk modulus (K) (P-V) is {bulk_modulus2:.6f} GPa\n")
+                yield_file.write(f"# Estimated Bp (E-V) (K) is {Bp:.6f} \n")
+                yield_file.write(f"# Estimated Bp (P-V) (K) is {Bp2:.6f} \n")
+                yield_file.write(f"# Estimated Yield strength using {offset} offset is {yield_strength[1]:.6f} GPa\n")
+                yield_file.write(f"# Estimated Shear modulus (G) is {G:.6f} GPa\n")
+                yield_file.write(f"# Estimated First Lamé parameter (lambda) is {lame1:.6f} GPa\n")
+                yield_file.write(f"# Estimated Second Lamé parameter (mu) is {lame2:.6f} GPa\n")
+                
+            yield_file.write(f"# Estimated Resilience is {yield_strength[2]:.6f} J/m^3\n")
+            yield_file.write(f"# Estimated Toughness is {yield_strength[3]:.6f} J/m^3\n")
+            yield_file.write(f"# Estimated Ductility(%) is {ductility:.3f} %\n")
+            yield_file.write(f"# Estimated Ductility Index(%) is {ductility_index:.3f} %\n")
+            yield_file.write(f"# Estimated Poisson's ratio (v) is {v:.6f} \n")
+            yield_file.write(f"# Estimated Grüneisen parameter (gamma) is {gamma:.6f}\n")
+            yield_file.write(f"# Estimated Longitudinal sound velocity (V_l) is {V_l:.6f} km/s\n")
+            yield_file.write(f"# Estimated Shear sound velocity (V_s) is {V_s:.6f} km/s\n")
+            yield_file.write(f"# Estimated Mean sound velocity (V_m) is {V_m:.6f} km/s\n")
+            yield_file.write(f"# Estimated Pwave velocity (V_p) is {V_p:.6f} km/s\n")
+            yield_file.write(f"# Estimated Debye temperature (T_D) is {T_D:.6f} K\n")
+
+            yield_file.write(f"# Estimated Min thermal Conductivity (Slack) is {KSlack:.6f} W/mK\n")
+            yield_file.write(f"# Estimated Min thermal  Conductivity (Clarke) is {KClarke:.6f} W/mK\n")
+            yield_file.write(f"# Estimated Min thermal  Conductivity (Cahill) is {KCahill:.6f} W/mK\n")
+            yield_file.write(f"# Estimated Integrated min thermal  Conductivity (Slack) is {KSlack_int:.6f} W/mK\n")
+                        
         else:
             yield_file.write("# Estimated yield strength: Not available ")
     
@@ -362,18 +706,166 @@ for component in active_components:
             yield_file.write(f"# {component} ultimate strength: {max_stress:.6f} N/m\n")
         else:
             yield_file.write(f"# {component} ultimate strength: {max_stress:.6f} GPa\n")
-    
-    if dim =="2D":
-        print(f"Estimated yield strength using {offset} and yield strength using linearity method are: {yieldstrength: .2f} N/m and {yieldstrength_linearity[0]: .2f} N/m \nThe {component} ultimate strength is: {max_stress:.2f} N/m ")
-    else:
-        print(f"Estimated yield strength using {offset} and yield strength using linearity method are: {yieldstrength: .2f} GPa and {yieldstrength_linearity[0]: .2f} GPa \nThe {component} ultimate strength is: {max_stress:.2f} GPa ")
-    print(f"Energy Storage Capacity at max strain {max_strain:.3f} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg")
 
-    # Save results and plot
-    # if mode == "DFT":
-    #     save_and_plot(component, stresses, strains, yieldstrength, mean_vol_list, mean_press_list, mode, None)  #(component, stresses, strains, yieldstrength)
-    # elif mode == "MD":
-    #     save_and_plot(component, stresses, strains, yieldstrength, mean_vol_list, mean_press_list, mode, mean_temp_list) 
+    elif use_saved_data:
+
+        #Repopulate to ensure we have the right info
+        strains = results["strains"]
+        stresses = results["stresses"]
+        mean_vol_list = results["volumes"]
+        mean_ener_list = results["energies"]
+        mean_press_list = results["pressures"]
+        mean_temp_list = results["temps"]
+        
+        
+        # Ensure values are floats before formatting
+        try:
+            # Convert each element within the lists to float
+            strains = [float(strain) for strain in strains]
+            stresses = [float(stress) for stress in stresses]
+            mean_vol_list = [float(vol) for vol in mean_vol_list]
+            mean_ener_list = [float(ener) for ener in mean_ener_list]
+            mean_temp_list = [float(temp) if temp is not None else 0.0 for temp in mean_temp_list]
+            mean_press_list = [float(press) for press in mean_press_list]
+        except (ValueError, TypeError) as e:
+            print(f"Error: Non-float value encountered: {e}")
+
+            
+         
+        strengthfile = f"{mode}_{component}_strength.dat"
+
+        with open(strengthfile, "w") as yield_file:
+        
+            if mode == "MD":
+                if dim == "2D":
+                    yield_file.write("# Strain\tStress (N/m)\tMean Volume (A^3)\tMean Energy(eV)\tMean Temperature (K)\tMean Pressure (N/m)\n")
+                else:
+                    yield_file.write("# Strain\tStress (GPa)\tMean Volume (A^3)\tMean Energy(eV)\tMean Temperature (K)\tMean Pressure (GPa)\n")
+                yield_file.write("0.0\t0.0\t0.0\t0.0\t0.0\t0.0\n")
+            elif mode == "DFT":
+                if dim == "2D":
+                    yield_file.write("# Strain\tStress (N/m)\tMean Volume (A^3)\tMean Energy(eV)\tMean Pressure (N/m)\n")
+                else:
+                    yield_file.write("# Strain\tStress (GPa)\tMean Volume (A^3)\tMean Energy(eV)tMean Pressure (GPa)\n")
+                yield_file.write("0.0\t0.0\t0.0\t0.0\t0.0\n")        
+
+                    
+            try:
+                for strain, stress, vol, ener, press in zip(strains, stresses, mean_vol_list, mean_ener_list, mean_press_list):
+                    temp = mean_temp_list.pop(0) if mean_temp_list else 0.0
+                    #print(f"Writing: {strain:.6f}\t{stress:.6f}\t{vol:.6f}\t{ener:.6f}\t{temp:.6f}\t{press:.6f}")
+                    if mode == "MD":
+                        yield_file.write(f"{strain:.6f}\t{stress:.6f}\t{vol:.6f}\t{ener:.6f}\t{temp:.6f}\t{press:.6f}\n")
+                    elif mode == "DFT":
+                        yield_file.write(f"{strain:.6f}\t{stress:.6f}\t{vol:.6f}\t{ener:.6f}\t{press:.6f}\n")
+            
+            
+            
+                if yield_strength[1] is not None:
+                    if dim == "2D":
+                        yield_file.write(f"# Energy Storage Capacity at max strain {max_strain:.4f} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg, Thickness {thickness_2D} Å \n")
+                        yield_file.write(f"# Estimated Young modulus (E) is {yield_strength[0]:.6f} N/m\n")
+                        yield_file.write(f"# Estimated Stiffness constant (E-A) (K) is {bulk_modulus:.6f} N/m\n")
+                        yield_file.write(f"# Estimated Stiffness constant (P-A) (K) is {bulk_modulus2:.6f} N/m\n")
+                        yield_file.write(f"# Estimated Bp (E-A) (K) is {Bp:.6f} \n")
+                        yield_file.write(f"# Estimated Bp (P-A) (K) is {Bp2:.6f} \n")
+                        yield_file.write(f"# Estimated Yield strength using {offset} offset is {yield_strength[1]:.6f} N/m\n")
+                     
+                        yield_file.write(f"# Estimated Shear modulus (G) is {G:.6f} N/m\n")
+                        yield_file.write(f"# Estimated First Lamé parameter (lambda) is {lame1:.6f} N/m\n")
+                        yield_file.write(f"# Estimated Second Lamé parameter (mu) is {lame2:.6f} N/m\n")
+                    else:
+                        yield_file.write(f"# Energy Storage Capacity at max strain {max_strain:.4f} is {energy_density_MJ_L:.3f} MJ/L or {energy_density_Wh_kg:.3f} Wh/Kg \n")
+                        yield_file.write(f"# Estimated Young modulus (E) is {yield_strength[0]:.6f} GPa\n")
+                        yield_file.write(f"# Estimated Bulk modulus (K) (E-V) is {bulk_modulus:.6f} GPa\n")
+                        yield_file.write(f"# Estimated Bulk modulus (K) (P-V) is {bulk_modulus2:.6f} GPa\n")
+                        yield_file.write(f"# Estimated Bp (E-V) (K) is {Bp:.6f} \n")
+                        yield_file.write(f"# Estimated Bp (P-V) (K) is {Bp2:.6f} \n")
+                        yield_file.write(f"# Estimated Yield strength using {offset} offset is {yield_strength[1]:.6f} GPa\n")
+                        
+                        yield_file.write(f"# Estimated Shear modulus (G) is {G:.6f} GPa\n")
+                        yield_file.write(f"# Estimated First Lamé parameter (lambda) is {lame1:.6f} GPa\n")
+                        yield_file.write(f"# Estimated Second Lamé parameter (mu) is {lame2:.6f} GPa\n")
+                        
+                    yield_file.write(f"# Estimated Resilience is {yield_strength[2]:.6f} J/m^3\n")
+                    yield_file.write(f"# Estimated Toughness is {yield_strength[3]:.6f} J/m^3\n")
+                    yield_file.write(f"# Estimated Ductility(%) is {ductility:.3f} %\n")
+                    yield_file.write(f"# Estimated Ductility Index(%) is {ductility_index:.3f} %\n")
+                    yield_file.write(f"# Estimated Poisson's ratio (v) is {v:.6f} \n")
+                    yield_file.write(f"# Estimated Grüneisen parameter (gamma) is {gamma:.6f}\n")
+                    yield_file.write(f"# Estimated Longitudinal sound velocity (V_l) is {V_l:.6f} km/s\n")
+                    yield_file.write(f"# Estimated Shear sound velocity (V_s) is {V_s:.6f} km/s\n")
+                    yield_file.write(f"# Estimated Mean sound velocity (V_m) is {V_m:.6f} km/s\n")
+                    yield_file.write(f"# Estimated Pwave velocity (V_p) is {V_p:.6f} km/s\n")
+                    yield_file.write(f"# Estimated Debye temperature (T_D) is {T_D:.6f} K\n")
+
+                    yield_file.write(f"# Estimated Min thermal Conductivity (Slack) is {KSlack:.6f} W/mK\n")
+                    yield_file.write(f"# Estimated Min thermal  Conductivity (Clarke) is {KClarke:.6f} W/mK\n")
+                    yield_file.write(f"# Estimated Min thermal  Conductivity (Cahill) is {KCahill:.6f} W/mK\n")
+                    yield_file.write(f"# Estimated Integrated min thermal  Conductivity (Slack) is {KSlack_int:.6f} W/mK\n")
+
+                else:
+                    yield_file.write("# Estimated yield strength: Not available\n")
+            
+                if dim == "2D":
+                    yield_file.write(f"# {component} ultimate strength: {max_stress:.6f} N/m\n")
+                else:
+                    yield_file.write(f"# {component} ultimate strength: {max_stress:.6f} GPa\n")
+                    
+            except Exception as e:
+                print(f"Error occured: {e}")
+                logging.info(f"{e}")
+                pass 
+
+    try:
+        if dim =="2D":
+            print(f"Estimated Yield strength using {offset} offset is {yield_strength[1]:.2f} N/m".center(box_width, '-'))
+            print(f"Estimated Young modulus (E) is {yield_strength[0]:.2f} N/m".center(box_width, '-'))
+            print(f"Estimated Stiffness constant (K) (E-A) is {bulk_modulus:.2f} N/m".center(box_width, '-'))
+            print(f"Estimated Stiffness constant (K) (P-A) is {bulk_modulus2:.2f} N/m".center(box_width, '-'))
+            print(f"Estimated Bp (E-A) is {Bp:.2f}".center(box_width, '-'))
+            print(f"Estimated Bp (P-A) is {Bp2:.2f}".center(box_width, '-'))
+            print(f"The {component} ultimate strength is: {max_stress:.2f} N/m".center(box_width, '-'))
+            print(f"Predicted thickness is: {thickness_2D:.2f} Å".center(box_width, '-'))
+            print(f"Estimated Shear modulus (G) is {G:.3f} N/m".center(box_width, '-'))
+            print(f"Estimated First Lamé parameter (lambda) is {lame1:.3f} N/m".center(box_width, '-'))
+            print(f"Estimated Second Lamé parameter (mu) is {lame2:.3f} N/m".center(box_width, '-'))
+
+        else:
+            print(f"Estimated Yield strength using {offset} offset is {yield_strength[1]:.2f} GPa".center(box_width, '-'))
+            print(f"Estimated Young modulus (E) is {yield_strength[0]:.3f} GPa".center(box_width, '-'))
+            print(f"Estimated Bulk modulus (K) is (E-V) {bulk_modulus:.3f} GPa".center(box_width, '-'))
+            print(f"Estimated Bulk modulus (K) is (P-V) {bulk_modulus2:.3f} GPa".center(box_width, '-'))
+            print(f"Estimated Bp (E-V) is {Bp:.2f}".center(box_width, '-'))
+            print(f"Estimated Bp (P-V) is {Bp2:.2f}".center(box_width, '-'))
+            print(f"The {component} ultimate strength is: {max_stress:.2f} GPa".center(box_width, '-'))
+            print(f"Estimated Shear modulus (G) is {G:.3f} GPa".center(box_width, '-'))
+            print(f"Estimated First Lamé parameter (lambda) is {lame1:.3f} GPa".center(box_width, '-'))
+            print(f"Estimated Second Lamé parameter (mu) is {lame2:.3f} GPa".center(box_width, '-'))
+        print(f"Estimated Resilience is {yield_strength[2]:.6f} J/m^3".center(box_width, '-'))
+        print(f"Estimated Toughness is {yield_strength[3]:.6f} J/m^3".center(box_width, '-'))
+        print(f"Estimated Energy Storage Capacity at max strain {max_strain:.3f} is {energy_density_MJ_L:.3f} MJ/L".center(box_width, '-'))
+        print(f"Estimated Energy Storage Capacity at max strain {max_strain:.3f} is {energy_density_Wh_kg:.3f} Wh/Kg".center(box_width, '-'))
+        print(f"The Ductility(%) is {ductility:.3f}".center(box_width, '-'))
+        print(f"The Ductility Index(%) is {ductility_index:.3f}".center(box_width, '-'))
+        print(f"Estimated Poisson's ratio (v) is {v:.3f}".center(box_width, '-'))
+        print(f"Estimated Longitudinal sound velocity (V_l) is {V_l:.3f} m/s".center(box_width, '-'))
+        print(f"Estimated Shear sound velocity (V_s) is {V_s:.3f} m/s".center(box_width, '-'))
+        print(f"Estimated Mean sound velocity (V_m) is {V_m:.3f} m/s".center(box_width, '-'))
+        print(f"Estimated Pwave velocity (V_p) is {V_p:.3f} m/s".center(box_width, '-'))
+        print(f"Estimated Debye temperature (T_D) is {T_D:.3f} K".center(box_width, '-'))
+        print(f"Estimated Grüneisen parameter (gamma) is {gamma:.3f}".center(box_width, '-'))
+
+        print(f"Estimated Min thermal Conductivity (Slack) is: {KSlack:.2f} W/mK".center(box_width, '-'))
+        print(f"Estimated Min thermal Conductivity (Clarke) is: {KClarke:.2f} W/mK".center(box_width, '-'))
+        print(f"Estimated Min thermal Conductivity (Cahill) is: {KCahill:.2f} W/mK".center(box_width, '-'))
+        print(f"Estimated Integrated min thermal Conductivity (Slack) is: {KSlack_int:.2f} W/mK".center(box_width, '-'))
+        
+    except Exception as e:
+        print(f"{e}")
+        logging.info(f"{e}")
+        pass 
+                    
     end_time = time.time()  # Capture the end time
     elapsed_time = end_time - start_time  # Calculate the elapsed time
     if not use_saved_data:
@@ -381,15 +873,162 @@ for component in active_components:
             print_banner2(yield_file=strengthfile, elapsed_time=elapsed_time, filename_struct=filename_struct)
         else:
             print_banner2(yield_file=strengthfile, elapsed_time=elapsed_time)
-    print_boxed_message()
-    #print(f"Results are written in {filename_struct} and structure information at each given stress and strain saved in {yield_file}.")
+
+    try:
+        yield_strength_label = "Yield Strength (σ_y)"
+        yield_strength_value = f"{yield_strength[1]:.3f} GPa" if dim != "2D" else f"{yield_strength[1]:.3f} N/m"
+
+        stiffness_label = "Stiffness (E)"
+        stiffness_value = f"{yield_strength[0]:.3f} GPa" if dim != "2D" else f"{yield_strength[0]:.3f} N/m"
+
+
+        stiffnessconstant_label = "Stiffness (K)"
+        stiffnessconstant_value = f"{bulk_modulus:.3f} (E-V) GPa" if dim != "2D" else f"{bulk_modulus:.3f}  (E-A) N/m"
+
+
+        stiffnessconstant_label2 = "Stiffness (K)"
+        stiffnessconstant_value2 = f"{bulk_modulus2:.3f} (P-V) GPa" if dim != "2D" else f"{bulk_modulus2:.3f} (P-A) N/m"    
       
-    #print(f"Job finished at {current_time } on {current_date} using {elapsed_time:.2f} s\n")
+        Bp_label = "Bp"
+        Bp_value = f"{Bp:.3f}" 
+        
+        maxstress_label = "Ultimate strength (σ_s)"
+        maxstress_value = f"{max_stress:.3f} GPa" if dim != "2D" else f"{max_stress:.3f} N/m"
+        
+        thick_label = "Thickness of material"
+        thicknessval = f"{thickness_2D:.3f} Å" if dim == "2D" else None
+        poisson_ratio_label = "Poisson's ratio (v)"
+        poisson_ratio_value = f"{v:.3f}"
 
-    with open("computetime.log", 'w') as f:
+        shear_modulus_label = "Shear modulus (G)"
+        shear_modulus_value = f"{G:.3f} GPa" if dim != "2D" else f"{G:.3f} N/m"
+
+
+        longitudinal_velocity_label = "Longitudinal sound velocity (V_l)"
+        longitudinal_velocity_value = f"{V_l:.3f} m/s"
+
+        shear_velocity_label = "Shear sound velocity (V_s)"
+        shear_velocity_value = f"{V_s:.3f} m/s"
+
+        mean_velocity_label = "Mean sound velocity (V_m)"
+        mean_velocity_value = f"{V_m:.3f} m/s"
+
+        pwave_velocity_label = "Pwave velocity (V_p)"
+        pwave_velocity_value = f"{V_p:.3f} m/s"
+
+        debye_temperature_label = "Debye temperature (T_D)"
+        debye_temperature_value = f"{T_D:.3f} K"
+
+        lame1_label = "First Lamé parameter (lambda)"
+        lame1_value = f"{lame1:.3f} GPa" if dim != "2D" else f"{lame1:.3f} N/m"
+
+
+        lame2_label = "Second Lamé parameter (mu)"
+        lame2_value = f"{lame2:.3f} GPa" if dim != "2D" else f"{lame2:.3f} N/m"
+
+
+        gruneisen_label = "Grüneisen parameter (gamma)"
+        gruneisen_value = f"{gamma:.3f}"
+        
+        # Defining labels and values for thermal conductivities
+        KSlack_label = "Min thermal Conductivity (Slack)"
+        KSlack_value = f"{KSlack:.3f} W/mK"
+
+        KClarke_label = "Min thermal Conductivity (Clarke)"
+        KClarke_value = f"{KClarke:.3f} W/mK"
+
+        KCahill_label = "Min thermal  Conductivity (Cahill)"
+        KCahill_value = f"{KCahill:.3f} W/mK"
+
+        KSlack_int_label = "Integrated min thermal Conductivity (Slack)"
+        KSlack_int_value = f"{KSlack_int:.3f} W/mK"
+        
+    except Exception as e:
+        print(f"{e}")
+        logging.info(f"{e}")
+        pass     
+
+    data = [
+        ("Ultimate strain (ε)", f"{max_strain:.3f} "),
+        (maxstress_label, maxstress_value),
+        (yield_strength_label, yield_strength_value),
+        (stiffnessconstant_label,stiffnessconstant_value),
+        (stiffnessconstant_label2,stiffnessconstant_value2),
+        (Bp_label,Bp_value),
+        (stiffness_label, stiffness_value),
+        (thick_label, thicknessval),
+        ("Resilience (U_r)", f"{yield_strength[2]:.3f} J/m^3"),
+        ("Toughness (U_r)", f"{yield_strength[3]:.3f} J/m^3"),
+        ("Energy storage capacity (E_c)", f"{energy_density_MJ_L:.3f} MJ/L"),
+        ("Energy storage capacity (E_c)", f"{energy_density_Wh_kg:.3f} Wh/Kg"),
+        ("Ductility (%D)", f"{ductility:.3f} %"),
+        ("Ductility Index (%DI)", f"{ductility_index:.3f} %"),
+        (poisson_ratio_label, poisson_ratio_value),
+        (shear_modulus_label, shear_modulus_value),
+        (longitudinal_velocity_label, longitudinal_velocity_value),
+        (shear_velocity_label, shear_velocity_value),
+        (mean_velocity_label, mean_velocity_value),
+        (pwave_velocity_label, pwave_velocity_value),
+        (debye_temperature_label, debye_temperature_value),
+        (lame1_label, lame1_value),
+        (lame2_label, lame2_value),
+        (gruneisen_label, gruneisen_value),
+        (KSlack_label, KSlack_value),
+        (KClarke_label, KClarke_value),
+        (KCahill_label, KCahill_value),
+        (KSlack_int_label, KSlack_int_value)
+    ]         
+      
+    with open(filename_smatool, 'a') as sm_file:
+        print_banner(version,component,code_type, mode,ec_file=sm_file)
+        print_line(sm_file, "=" * box_width, border_char="+", filler_char="-")
+        
+        description = "                   This is a {} lattice".format(dim)
+        print_line(sm_file, description)
+        print_line(sm_file, "=" * box_width, border_char="+", filler_char="-")
+        
+        for label, value in data:
+            line = f"{label} = {value}"
+            centered_line = line.center(box_width)
+            sm_file.write(centered_line + '\n')
+
+        print_boxed_message(ec_file=sm_file)
+
+    for file in os.listdir('.'): 
+        if file.endswith('.png'):
+            shutil.move(file, os.path.join(destination_folder, file))
+
+    print_boxed_message()
+    print("")
+    print("Results are saved in the various component files")
+    print("SMATool general output is in smatool.out")
+    print("Enthalpy information is in enthalpy.dat")
+    print("Schmid factor saved in schmid_factor.dat")
+    print("Work hardening rate is in xx_work_hardening_rate.dat")
+    print("Structure info in VASP format at each strain saved in '.ss' file")
+    print("Yield strength profile saved in the smatool_plots folder")
+    print("")
+    print("Well done! GOOD LUCK!")
+    print("")
+
+    logging.info("")
+    logging.info("Results are saved in the various component files")
+    logging.info("SMATool general output is in smatool.out")
+    logging.info("Enthalpy information is in enthalpy.dat")
+    logging.info("Schmid factor saved in schmid_factor.dat")
+    logging.info("Work hardening rate is in xx_work_hardening_rate.dat")
+    logging.info("Structure info in VASP format at each strain saved in '.ss' file")
+    logging.info("Yield strength profile saved in the smatool_plots folder")
+    logging.info("")
+    logging.info(f"Calculation done in {elapsed_time:.2f}")
+    
+    logging.info("Well done! GOOD LUCK!")
+    logging.info(f"SMATool calculation Ended at {datetime.now().strftime('%H:%M:%S')} on {datetime.now().strftime('%Y-%m-%d')}")
+    
+    with open("smatoolcompute.time", 'w') as f:
         f.write(f"Calculation done in {elapsed_time:.2f} s\n")
-
-    if not use_saved_data:
-        yield_file.close()
+        
+    #if not use_saved_data:
+    yield_file.close()
 
 

@@ -17,7 +17,9 @@ plusminus = off
 yieldpoint_offset = 0.002
 # stress components: Tensile_x Tensile_y Tensile_z Tensile_biaxial ideal_strength Shear (xz for 1D and 3D and xy for 2D)
 # you can wrote for more than one case by just listing them (no comma, just space)  
-components = Tensile_x Tensile_y Tensile_biaxial indent_strength Shear
+components = Tensile_x
+
+#Tensile_y Tensile_biaxial indent_strength Shear
 #supercell for MD simulation
 md_supercell = 1, 1, 1
 #save structure files at each strain
@@ -31,9 +33,8 @@ slip_parameters = 1-11, 111
 #slipping on; must be on/yes/1 once shear modeling is enabled
 slipon = off
 #potential directory
-potential_dir = pot/
-#potential_dir = /home/chineduekuma/codes/QE/pseudo/
+potential_dir = /potential
 #Use saved data. postprocessing to obtain yield strength
-use_saved_data = false
+use_saved_data = true
 #job submission command
 job_submit_command = mpirun -n 2 vasp_std > log

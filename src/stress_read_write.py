@@ -107,12 +107,13 @@ def read_stress_data(filename, component, file_type, method):
                         except ValueError:
                             continue  # Skip lines that cannot be converted to float
                 elif file_type == "QE":
-                    if len(data) >= 4:  # QE usually has at least 4 data columns
+                    if len(data) >= 5:  # QE usually has at least 4 data columns
                         try:
                             strains.append(float(data[0].strip()))
                             stresses.append(float(data[1].strip()))
                             volumes.append(float(data[2].strip()))
                             energies.append(float(data[3].strip()))
+                            pressures.append(float(data[4].strip()))
                             if method == "MD" and len(data) >= 5:
                                 temps.append(float(data[4].strip()))
                         except ValueError:

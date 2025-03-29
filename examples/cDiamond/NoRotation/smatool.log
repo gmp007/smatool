@@ -1,0 +1,76 @@
+2024-06-09 00:59:32 - INFO - SMATool calculation started at 00:59:32 on 2024-06-09
+2024-06-09 00:59:32 - INFO - ==================================
+2024-06-09 00:59:32 - INFO - Input file used in calculation:
+2024-06-09 00:59:32 - INFO - code_type: VASP
+2024-06-09 00:59:32 - INFO - use_saved_data: True
+2024-06-09 00:59:32 - INFO - use_dnn_gan: False
+2024-06-09 00:59:32 - INFO - strains: 0.01 0.8 0.01
+2024-06-09 00:59:32 - INFO - yieldpoint_offset: 0.002
+2024-06-09 00:59:32 - INFO - nlayers: 1
+2024-06-09 00:59:32 - INFO - vdwgap: 3.5
+2024-06-09 00:59:32 - INFO - dimensional: 3D
+2024-06-09 00:59:32 - INFO - mode: DFT
+2024-06-09 00:59:32 - INFO - scrystal: cubic
+2024-06-09 00:59:32 - INFO - plusminus: False
+2024-06-09 00:59:32 - INFO - use_schmid_factors: False
+2024-06-09 00:59:32 - INFO - components: ['Tensile_x', 'Tensile_biaxial', 'indent_strength', 'Shear']
+2024-06-09 00:59:32 - INFO - md_supercell: [1, 1, 1]
+2024-06-09 00:59:32 - INFO - md_timestep: 2.0
+2024-06-09 00:59:32 - INFO - indent_radius: 0.0
+2024-06-09 00:59:32 - INFO - custom_options: {'potential_dir': '/home/chineduekuma/codes/vasp/PBE'}
+2024-06-09 00:59:32 - INFO - job_submit_command: mpirun -n 2 vasp_std > log
+2024-06-09 00:59:32 - INFO - structure_file: C.cif
+2024-06-09 00:59:32 - INFO - rotation: False
+2024-06-09 00:59:32 - INFO - save_struct: True
+2024-06-09 00:59:32 - INFO - slipon: False
+2024-06-09 00:59:32 - INFO - slip_parameters: 1-11, 111
+2024-06-09 00:59:32 - INFO - Input parameters from smatool.in ends
+2024-06-09 00:59:32 - INFO - ==================================
+2024-06-09 00:59:33 - INFO - 
+2024-06-09 00:59:33 - INFO - Results are saved in the various component files
+2024-06-09 00:59:33 - INFO - SMATool general output is in smatool.out
+2024-06-09 00:59:33 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-09 00:59:33 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-09 00:59:33 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-09 00:59:33 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-09 00:59:33 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-09 00:59:33 - INFO - 
+2024-06-09 00:59:33 - INFO - Calculation done in 0.76
+2024-06-09 00:59:33 - INFO - Well done! GOOD LUCK!
+2024-06-09 00:59:33 - INFO - SMATool calculation Ended at 00:59:33 on 2024-06-09
+2024-06-09 00:59:34 - INFO - 
+2024-06-09 00:59:34 - INFO - Results are saved in the various component files
+2024-06-09 00:59:34 - INFO - SMATool general output is in smatool.out
+2024-06-09 00:59:34 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-09 00:59:34 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-09 00:59:34 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-09 00:59:34 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-09 00:59:34 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-09 00:59:34 - INFO - 
+2024-06-09 00:59:34 - INFO - Calculation done in 1.49
+2024-06-09 00:59:34 - INFO - Well done! GOOD LUCK!
+2024-06-09 00:59:34 - INFO - SMATool calculation Ended at 00:59:34 on 2024-06-09
+2024-06-09 00:59:35 - INFO - 
+2024-06-09 00:59:35 - INFO - Results are saved in the various component files
+2024-06-09 00:59:35 - INFO - SMATool general output is in smatool.out
+2024-06-09 00:59:35 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-09 00:59:35 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-09 00:59:35 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-09 00:59:35 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-09 00:59:35 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-09 00:59:35 - INFO - 
+2024-06-09 00:59:35 - INFO - Calculation done in 2.17
+2024-06-09 00:59:35 - INFO - Well done! GOOD LUCK!
+2024-06-09 00:59:35 - INFO - SMATool calculation Ended at 00:59:35 on 2024-06-09
+2024-06-09 00:59:35 - INFO - 
+2024-06-09 00:59:35 - INFO - Results are saved in the various component files
+2024-06-09 00:59:35 - INFO - SMATool general output is in smatool.out
+2024-06-09 00:59:35 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-09 00:59:35 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-09 00:59:35 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-09 00:59:35 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-09 00:59:35 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-06-09 00:59:35 - INFO - 
+2024-06-09 00:59:35 - INFO - Calculation done in 2.84
+2024-06-09 00:59:35 - INFO - Well done! GOOD LUCK!
+2024-06-09 00:59:35 - INFO - SMATool calculation Ended at 00:59:35 on 2024-06-09

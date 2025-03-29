@@ -1,0 +1,39 @@
+ running on    2 total cores
+ distrk:  each k-point on    2 cores,    1 groups
+ distr:  one band on    1 cores,    2 groups
+ vasp.6.2.1 16May21 (build Oct 21 2023 21:03:18) complex                        
+  
+ POSCAR found type information on POSCAR MoS 
+ POSCAR found :  2 types and       3 ions
+ scaLAPACK will be used
+ -----------------------------------------------------------------------------
+|                                                                             |
+|           W    W    AA    RRRRR   N    N  II  N    N   GGGG   !!!           |
+|           W    W   A  A   R    R  NN   N  II  NN   N  G    G  !!!           |
+|           W    W  A    A  R    R  N N  N  II  N N  N  G       !!!           |
+|           W WW W  AAAAAA  RRRRR   N  N N  II  N  N N  G  GGG   !            |
+|           WW  WW  A    A  R   R   N   NN  II  N   NN  G    G                |
+|           W    W  A    A  R    R  N    N  II  N    N   GGGG   !!!           |
+|                                                                             |
+|     The value NPAR = 4 specified in the INCAR file was overwritten,         |
+|     because it was not compatible with the 2 processes available:           |
+|     NPAR = 2                                                                |
+|     was used instead, please check that this makes sense for your           |
+|     machine.                                                                |
+|                                                                             |
+ -----------------------------------------------------------------------------
+
+ LDA part: xc-table for Pade appr. of Perdew
+ POSCAR, INCAR and KPOINTS ok, starting setup
+ FFT: planning ...
+ WAVECAR not read
+ entering main loop
+       N       E                     dE             d eps       ncg     rms          rms(c)
+DAV:   1     0.134634336405E+03    0.13463E+03   -0.71803E+03   224   0.111E+03
+DAV:   2    -0.927295861065E+01   -0.14391E+03   -0.13606E+03   360   0.212E+02
+DAV:   3    -0.221093919113E+02   -0.12836E+02   -0.12631E+02   290   0.716E+01
+DAV:   4    -0.224023354358E+02   -0.29294E+00   -0.29123E+00   284   0.128E+01
+DAV:   5    -0.224112730334E+02   -0.89376E-02   -0.89307E-02   314   0.213E+00    0.257E+01
+DAV:   6    -0.213596668111E+02    0.10516E+01   -0.52668E+00   280   0.177E+01    0.941E+00
+DAV:   7    -0.212624940177E+02    0.97173E-01   -0.42063E+00   278   0.169E+01    0.793E+00
+DAV:   8    -0.209222674530E+02    0.34023E+00   -0.63083E-01   284   0.697E+00    0.164E+00

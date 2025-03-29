@@ -27,15 +27,20 @@ from ase.io.trajectory import Trajectory
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
 #from read_write import applystrain
 from optimize_struct_qe import find_qe_pseudopotentials
-from process_stress import compute_average_stress, process_md_stresses, process_dft_stresses_qe
+from process_stress import process_md_stresses, process_dft_stresses_qe
 from calculate_stress import convert_stress_units
 from read_write import read_and_write_kpoints,read_options_from_input,update_qe_object
 from modify_incar import ChangeDir,WildCard
 from shear_tensile_constraint import ShearTensileConstraint
+from calculate_stress import apply_indentation_strain
 
 
 
 options = read_options_from_input()
+dim = options.get("dimensional", "3D")
+
+strain_direction, slip_direction = options.get("slip_parameters").split(", ")
+indenter_radius = options.get("indent_radius", 2.0) 
 
 def extract_stress_from_qe_output(output_path):
     stress_matrix_list = []
@@ -93,24 +98,40 @@ def calculate_stress_for_strain_qe(atoms, strain, stress_component_list=None, di
     - The stress for the given strain for the designated component.
     """
 
+# Voigt notation: [epsilon_xx, epsilon_yy, epsilon_zz, gamma_yz, gamma_xz, gamma_xy]
     mask_mapping = {
-        'Tensile_x': [0, 1, 1, 0, 0, 0],
-        'Tensile_y': [1, 0, 1, 0, 0, 0],
-        'Tensile_z': [1, 1, 0, 0, 0, 0],
-        'Shear': [0, 0, 0, 0, 1, 0],
-        'indent_strength': [0, 0, 0, 0, 1, 0],
-        'Tensile_biaxial': [0, 0, 1, 0, 0, 0],
+        'Tensile_x': [1, 0, 0, 0, 0, 0],
+        'Tensile_y': [0, 1, 0, 0, 0, 0],
+        'Tensile_z': [0, 0, 1, 0, 0, 0],
+        'Shear_xy':  [0, 0, 0, 0, 0, 1],
+        'Shear_yz':  [0, 0, 0, 1, 0, 0],
+        'Shear':  [0, 0, 0, 0, 1, 0], #Shear_xz
+        'Tensile_biaxial': [1, 1, 0, 0, 0, 0], #Tensile_biaxial_xy
+        'Hydrostatic': [1, 1, 1, 0, 0, 0],
+        'indent_strength': [0, 0, 1, 0, 0, 0],  # 
+        'ideal_strength': [1, 1, 1, 0, 0, 0],   # 
         'xx_yy_xy': [1, 1, 0, 0, 0, 1]
     }
+
     
+    # Adjust masks based on dimensionality
     if dim == "2D":
-        mask_mapping['Shear'] = [0, 0, 0, 0, 0, 1]
-        mask_mapping['indent_strength'] = [0, 0, 0, 0, 0, 1]
-    
-    
+        for key in mask_mapping:
+            mask_mapping[key][2] = 0  # Zero out epsilon_zz
+            mask_mapping[key][3] = 0  # Zero out gamma_yz
+            mask_mapping[key][4] = 0  # Zero out gamma_xz
+
+    if dim == "1D":
+        for key in mask_mapping:
+            mask_mapping[key][1] = 0  # Zero out epsilon_yy
+            mask_mapping[key][2] = 0  # Zero out epsilon_zz
+            mask_mapping[key][3] = 0  # Zero out gamma_yz
+            mask_mapping[key][4] = 0  # Zero out gamma_xz
+            mask_mapping[key][5] = 0  # Zero out gamma_xy
+            
+            
     mask = mask_mapping[stress_component_list] 
-    
-    
+      
     strained_atoms = copy.deepcopy(atoms) 
 
 
@@ -188,82 +209,42 @@ def calculate_stress_for_strain_qe(atoms, strain, stress_component_list=None, di
             
     with ChangeDir("Yield") as directory:
         cell = strained_atoms.get_cell().copy()
+           
+        if stress_component_list == 'indent_strength':
+            # Handle 'indent_strength' separately
+            original, cell = apply_indentation_strain(atoms, indenter_radius=indenter_radius, epsilon_0=strain, k=2, dimensionality=dim)
+            strained_atoms.set_cell(cell, scale_atoms=True)
+        else:
+            # Retrieve the mask for the specified stress component
+            mask = mask_mapping[stress_component_list]
 
-        strain_factor = (1.0 + strain)
-        if stress_component_list == 'Tensile_x':        
-            cell[0, 0] *= strain_factor  # Apply strain to x-component of the first lattice vector
-            cell[1, 0] *= strain_factor  # Apply strain to x-component of the second lattice vector
-            if dim=="3D" or dim=="1D":
-                cell[2, 0] *= strain_factor  # Apply strain to x-component of the third lattice vector
-        elif stress_component_list == 'Tensile_y':
-            cell[0, 1] *= strain_factor  # Apply strain to y-component of the first lattice vector
-            cell[1, 1] *= strain_factor  # Apply strain to y-component of the second lattice vector
-            if dim=="3D" or dim=="1D":
-                cell[2, 1] *= strain_factor  # Apply strain to y-component of the third lattice vector       
-#            cell[1, 1] *= (1 + strain)
-        elif stress_component_list == 'Tensile_z':
-            cell[0, 2] *= strain_factor  # Apply strain to z-component of the first lattice vector
-            cell[1, 2] *= strain_factor  # Apply strain to z-component of the second lattice vector
-            if dim=="3D" or dim=="1D":
-                cell[2, 2] *= strain_factor  # Apply strain to z-component of the third lattice vector
-        elif stress_component_list == 'Shear':
-            if dim =="3D" or dim == "1D":
-                #new_values = [[cell[i, 0] + cell[i, 2] * strain, cell[i, 2] + cell[i, 0] * strain] for i in range(3)]
-                
-                #for i in range(3):
-                #    cell[i, 0], cell[i, 2] = new_values[i]
-                
-                cell[0, 0] += cell[0, 2] * strain  # Shear in x influenced by z
-                cell[0, 2] += cell[0, 0] * strain  # Shear in z influenced by x
-                cell[1, 0] += cell[1, 2] * strain  # Shear in x influenced by z
-                cell[1, 2] += cell[1, 0] * strain  # Shear in z influenced by x
-                cell[2, 0] += cell[2, 2] * strain  # Shear in x influenced by z
-                cell[2, 2] += cell[2, 0] * strain  # Shear in z influenced by x
-            elif dim == "2D":
-                #new_values = [[cell[i, 0] + cell[i, 1] * strain, cell[i, 1] + cell[i, 0] * strain] for i in range(2)]
-                #for i in range(2):
-                #    cell[i, 0], cell[i, 1] = new_values[i]
-                cell[0, 0] += cell[0, 1] * strain  # Shear in x influenced by y
-                cell[0, 1] += cell[0, 0] * strain  # Shear in y influenced by x
-                cell[1, 0] += cell[1, 1] * strain  # Shear in x influenced by y
-                cell[1, 1] += cell[1, 0] * strain  # Shear in y influenced by x
+            # Initialize strain components in Voigt notation
+            # [epsilon_xx, epsilon_yy, epsilon_zz, gamma_yz, gamma_xz, gamma_xy]
+            strain_components = [strain * m for m in mask]
 
-        elif stress_component_list == 'indent_strength': #indent_strength
-            if dim =="3D" or dim == "1D":
-                cell[0, 2] += cell[0, 0] * strain  # Shear in the z-direction based on the x-component of the first lattice vector
-                cell[1, 2] += cell[1, 0] * strain  # Shear in the z-direction based on the x-component of the second lattice vector
-                cell[2, 2] += cell[2, 0] * strain  # Shear in the z-direction based on the x-component of the third lattice vector
-            elif dim == "2D":            
-                # Apply shear strain in the xy-plane
-                cell[0, 1] += cell[0, 0] * strain  # Shear in y influenced by x
-                cell[1, 1] += cell[1, 0] * strain  # Shear in y influenced by x
-                            
-        elif stress_component_list == 'Tensile_biaxial':
-            # Apply biaxial strain in the xx and yy directions
-            cell[0, 0] *= strain_factor  # Strain in the x-direction (xx)
-            cell[1, 1] *= strain_factor  # Strain in the y-direction (yy)
-            cell[1, 0] *= strain_factor  # Strain in the x-direction (xx) for the second lattice vector
-            cell[0, 1] *= strain_factor  # Strain in the y-direction (yy) for the first lattice vector
-            if dim=="3D" or dim=="1D":
-                cell[2, 0] *= strain_factor  # Strain in the x-direction (xx) for the third lattice vector
-                cell[2, 1] *= strain_factor  # Strain in the y-direction (yy) for the third lattice vector
-        elif stress_component_list == 'xx_yy_xy':
-            # Biaxial strain
-            cell[0, 0] *= (1 + strain)  # Strain in the x-direction (xx)
-            cell[1, 1] *= (1 + strain)  # Strain in the y-direction (yy)
-            # Shear strain
-            cell[0, 1] += cell[1, 1] * strain_factor  # Shear in the y-direction based on the y-component of the second lattice vector
-            cell[1, 0] += cell[0, 0] * strain_factor  # Shear in the x-direction based on the x-component of the first lattice vector
+            # Extract individual strain components
+            epsilon_xx = strain_components[0]
+            epsilon_yy = strain_components[1]
+            epsilon_zz = strain_components[2]
+            gamma_yz   = strain_components[3]
+            gamma_xz   = strain_components[4]
+            gamma_xy   = strain_components[5]
 
+            # Convert engineering shear strains to tensor shear strains
+            epsilon_yz = gamma_yz / 2
+            epsilon_xz = gamma_xz / 2
+            epsilon_xy = gamma_xy / 2
 
-            # Additionally, apply the strain to the x and y components of all lattice vectors
-            cell[1, 0] *= (1 + strain)  # Strain in the x-direction (xx) for the second lattice vector
-            cell[0, 1] *= (1 + strain)  # Strain in the y-direction (yy) for the first lattice vector
-            if dim=="3D" or dim=="1D":
-                cell[2, 0] *= (1 + strain)  # Strain in the x-direction (xx) for the third lattice vector
-                cell[2, 1] *= (1 + strain)  # Strain in the y-direction (yy) for the third lattice vector
+            # Construct the strain tensor
+            epsilon_tensor = np.array([
+                [epsilon_xx, epsilon_xy, epsilon_xz],
+                [epsilon_xy, epsilon_yy, epsilon_yz],
+                [epsilon_xz, epsilon_yz, epsilon_zz]
+            ])
 
-        strained_atoms.set_cell(cell, scale_atoms=True)
+            # Apply the strain tensor to the cell
+            new_cell = np.dot((np.eye(3) + epsilon_tensor), cell)
+            strained_atoms.set_cell(new_cell, scale_atoms=True)
         
         try:
             if mode == "MD":
@@ -348,7 +329,7 @@ def calculate_stress_for_strain_qe(atoms, strain, stress_component_list=None, di
                         energy_converged = True
 
                     if iteration_counter == 5:
-                        energy_convergence_threshold = 1e-6
+                        energy_convergence_threshold = 1e-4
                     elif iteration_counter == 20:
                         print("Convergence not achieved after 20 iterations. Exiting loop.")
                         break

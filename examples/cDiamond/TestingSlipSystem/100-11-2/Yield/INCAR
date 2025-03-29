@@ -1,0 +1,16 @@
+PREC = accurate
+ENCUT = 600
+EDIFF = 1e-06
+EDIFFG = 1e-05
+IBRION = 2
+ISIF = 2
+ISYM = 2
+ISMEAR = 0
+SIGMA = 0.1
+LREAL = False
+NPAR = 11
+NSW = 300
+ISTART = 0
+LCHARG = False
+LPLANE = False
+LWAVE = False

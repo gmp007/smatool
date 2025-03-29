@@ -18,11 +18,6 @@ except ImportError:
     from distutils.core import setup
 
 
-try:
-    from importlib.metadata import version  # Python 3.8+
-except ImportError:
-    from importlib_metadata import version  # Python <3.8
-
 #from setuptools import setup
 
 setup()

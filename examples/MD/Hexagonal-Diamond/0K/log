@@ -1,0 +1,241 @@
+Copied POTCAR for C to potentials/potpaw_PBE/C
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                            Results for Tensile_x                     ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 17:43:42 on 2024-01-08        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+       Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+LBFGS:    0 17:43:51      -37.075319*       0.0010
+DFT Optimization Done!
+Calculating for Tensile_x component.
+Strain:  0.0100, Stress:  20.0648
+Strain:  0.0150, Stress:  25.2834
+Strain:  0.0200, Stress:  30.3639
+Strain:  0.0300, Stress:  40.1158
+Strain:  0.0400, Stress:  49.3648
+Strain:  0.0500, Stress:  58.0880
+Strain:  0.0600, Stress:  66.3115
+Strain:  0.0700, Stress:  74.0366
+Strain:  0.0800, Stress:  81.2657
+Strain:  0.0900, Stress:  88.0080
+Strain:  0.1000, Stress:  94.3000
+Strain:  0.1100, Stress:  100.1352
+Strain:  0.1200, Stress:  105.5273
+Strain:  0.1300, Stress:  110.4818
+Strain:  0.1400, Stress:  115.0388
+Strain:  0.1500, Stress:  119.1762
+Strain:  0.1600, Stress:  122.9291
+Strain:  0.1700, Stress:  126.2745
+Strain:  0.1800, Stress:  129.2604
+Strain:  0.1900, Stress:  131.8755
+Strain:  0.2000, Stress:  134.1322
+Strain:  0.2100, Stress:  136.0436
+Strain:  0.2200, Stress:  137.6283
+Strain:  0.2300, Stress:  138.8810
+Strain:  0.2400, Stress:  139.8041
+Strain:  0.2500, Stress:  140.4129
+Strain:  0.2600, Stress:  140.7081
+Strain:  0.2700, Stress:  140.7075
+Strain:  0.2800, Stress:  140.3798
+Strain:  0.2900, Stress:  139.7271
+Strain:  0.3000, Stress:  138.7529
+Encountered 5 consecutive decreasing stress values. Exiting calculations.
+Estimated yield and Tensile_x strengths are:  20.06 GPa and 140.71 GPa 
+Energy Storage Capacity at max strain 0.260 is 4.573 MJ/L or 360.938 Wh/Kg
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤            Results are written in DFT_struct_Tensile_x.ss            ❤
+❤                      and structure information                       ❤
+❤                   at each stress and strain saved                    ❤
+❤                    in DFT_Tensile_x_strength.dat.                    ❤
+❤        Job finished at 17:48:35 on 2024-01-08 using 293.04 s         ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+| SMATool: An automated toolkit for tensile and ideal strengths of materials,  |
+|                          C.E. Ekuma and Z.-L. Liu,                           |
+|               Computer Physics Communications xxx, xxx, (2024)               |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|           for tensile and ideal strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                              Results for Shear                       ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 17:48:35 on 2024-01-08        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+DFT Optimization already completed. Skipping...
+Calculating for Shear component.
+Strain:  0.0100, Stress:  9.1134
+Strain:  0.0150, Stress:  13.6554
+Strain:  0.0200, Stress:  18.1752
+Strain:  0.0300, Stress:  27.1399
+Strain:  0.0400, Stress:  35.9487
+Strain:  0.0500, Stress:  44.5441
+Strain:  0.0600, Stress:  52.8692
+Strain:  0.0700, Stress:  60.8553
+Strain:  0.0800, Stress:  68.4236
+Strain:  0.0900, Stress:  75.4954
+Strain:  0.1000, Stress:  81.9802
+Strain:  0.1100, Stress:  87.7525
+Strain:  0.1200, Stress:  92.6872
+Strain:  0.1300, Stress:  96.6117
+Strain:  0.1400, Stress:  99.2860
+Strain:  0.1500, Stress:  100.3239
+Strain:  0.1600, Stress:  99.0228
+Strain:  0.1700, Stress:  93.5791
+Current stress value is more than 20% smaller than the previous value. Exiting calculations.
+Estimated yield and Shear strengths are:  9.11 GPa and 100.32 GPa 
+Energy Storage Capacity at max strain 0.150 is 1.881 MJ/L or 150.162 Wh/Kg
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤              Results are written in DFT_struct_Shear.ss              ❤
+❤                      and structure information                       ❤
+❤                   at each stress and strain saved                    ❤
+❤                      in DFT_Shear_strength.dat.                      ❤
+❤        Job finished at 17:51:54 on 2024-01-08 using 491.58 s         ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+| SMATool: An automated toolkit for tensile and ideal strengths of materials,  |
+|                          C.E. Ekuma and Z.-L. Liu,                           |
+|               Computer Physics Communications xxx, xxx, (2024)               |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|           for tensile and ideal strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                            Results for Tensile_z                     ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 17:51:54 on 2024-01-08        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+DFT Optimization already completed. Skipping...
+Calculating for Tensile_z component.
+Strain:  0.0100, Stress:  13.1052
+Strain:  0.0150, Stress:  18.7005
+Strain:  0.0200, Stress:  24.0245
+Strain:  0.0300, Stress:  33.9078
+Strain:  0.0400, Stress:  42.8064
+Strain:  0.0500, Stress:  50.6739
+Strain:  0.0600, Stress:  57.4198
+Strain:  0.0700, Stress:  63.0713
+Strain:  0.0800, Stress:  67.5612
+Strain:  0.0900, Stress:  70.7569
+Strain:  0.1000, Stress:  72.5403
+Strain:  0.1100, Stress:  72.6858
+Strain:  0.1200, Stress:  70.8110
+Strain:  0.1300, Stress:  66.3079
+Strain:  0.1400, Stress:  57.7655
+Current stress value is more than 20% smaller than the previous value. Exiting calculations.
+Estimated yield and Tensile_z strengths are:  13.11 GPa and 72.69 GPa 
+Energy Storage Capacity at max strain 0.110 is 0.999 MJ/L or 79.782 Wh/Kg
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤            Results are written in DFT_struct_Tensile_z.ss            ❤
+❤                      and structure information                       ❤
+❤                   at each stress and strain saved                    ❤
+❤                    in DFT_Tensile_z_strength.dat.                    ❤
+❤        Job finished at 17:54:09 on 2024-01-08 using 626.99 s         ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+| SMATool: An automated toolkit for tensile and ideal strengths of materials,  |
+|                          C.E. Ekuma and Z.-L. Liu,                           |
+|               Computer Physics Communications xxx, xxx, (2024)               |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|           for tensile and ideal strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                          Results for ideal_strength                  ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 17:54:09 on 2024-01-08        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+DFT Optimization already completed. Skipping...
+Calculating for ideal_strength component.
+Strain:  0.0100, Stress:  4.6366
+Strain:  0.0150, Stress:  6.9505
+Strain:  0.0200, Stress:  9.2623
+Strain:  0.0300, Stress:  13.8802
+Strain:  0.0400, Stress:  18.4796
+Strain:  0.0500, Stress:  23.0564
+Strain:  0.0600, Stress:  27.6056
+Strain:  0.0700, Stress:  32.1184
+Strain:  0.0800, Stress:  36.5928
+Strain:  0.0900, Stress:  41.0204
+Strain:  0.1000, Stress:  45.3964
+Strain:  0.1100, Stress:  49.7101
+Strain:  0.1200, Stress:  53.9621
+Strain:  0.1300, Stress:  58.1379
+Strain:  0.1400, Stress:  62.2406
+Strain:  0.1500, Stress:  66.2516
+Strain:  0.1600, Stress:  70.1708
+Strain:  0.1700, Stress:  73.9867
+Strain:  0.1800, Stress:  77.6918
+Strain:  0.1900, Stress:  81.2851
+Strain:  0.2000, Stress:  84.7470
+Strain:  0.2100, Stress:  88.0462
+Strain:  0.2200, Stress:  91.2034
+Strain:  0.2300, Stress:  94.1962
+Strain:  0.2400, Stress:  97.0049
+Strain:  0.2500, Stress:  99.6105
+Strain:  0.2600, Stress:  101.9942
+Strain:  0.2700, Stress:  104.1295
+Strain:  0.2800, Stress:  105.9870
+Strain:  0.2900, Stress:  107.5332
+Strain:  0.3000, Stress:  108.6656
+Strain:  0.3100, Stress:  109.3881
+Strain:  0.3200, Stress:  109.5712
+Strain:  0.3300, Stress:  109.0414
+Strain:  0.3400, Stress:  107.3681
+Strain:  0.3500, Stress:  103.8633
+Strain:  0.3600, Stress:  91.8206
+Current stress value is more than 20% smaller than the previous value. Exiting calculations.
+Estimated yield and ideal_strength strengths are:  4.64 GPa and 109.57 GPa 
+Energy Storage Capacity at max strain 0.320 is 4.383 MJ/L or 349.873 Wh/Kg
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤         Results are written in DFT_struct_ideal_strength.ss          ❤
+❤                      and structure information                       ❤
+❤                   at each stress and strain saved                    ❤
+❤                 in DFT_ideal_strength_strength.dat.                  ❤
+❤        Job finished at 18:00:44 on 2024-01-08 using 1021.86 s        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+| SMATool: An automated toolkit for tensile and ideal strengths of materials,  |
+|                          C.E. Ekuma and Z.-L. Liu,                           |
+|               Computer Physics Communications xxx, xxx, (2024)               |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|           for tensile and ideal strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+

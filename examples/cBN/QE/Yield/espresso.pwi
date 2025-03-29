@@ -1,0 +1,53 @@
+&CONTROL
+   calculation      = 'relax'
+   restart_mode     = 'from_scratch'
+   tstress          = .true.
+   tprnfor          = .true.
+   outdir           = './OPT'
+   forc_conv_thr    = 1e-05
+   pseudo_dir       = '/home/chineduekuma/codes/QE/pseudo/'
+/
+&SYSTEM
+   ecutwfc          = 60
+   ecutrho          = 600
+   occupations      = 'smearing'
+   degauss          = 0.01
+   smearing         = 'mp'
+   ntyp             = 2
+   nat              = 8
+   ibrav            = 0
+/
+&ELECTRONS
+   conv_thr         = 1e-08
+/
+&IONS
+   tolp             = 0.0001
+/
+&CELL
+   press            = 0.0
+   press_conv_thr   = 0.5
+   cell_dofree      = 'all'
+/
+
+ATOMIC_SPECIES
+B 10.81 B_pdojo.upf
+N 14.007 N_pdojo.upf
+
+K_POINTS automatic
+4 4 4  0 0 0
+
+CELL_PARAMETERS angstrom
+3.62600200000000 0.00000000000000 1.16032064000000
+0.00000000000000 3.62600200000000 0.00000000000000
+1.16032064000000 0.00000000000000 3.99730460480000
+
+ATOMIC_POSITIONS angstrom
+B 0.5982903300 0.4532502500 0.6447031556 
+B 1.1784506500 2.2662512500 2.6433554580 
+B 2.9914516500 0.4532502500 3.2235157780 
+B 2.4112913300 2.2662512500 1.2248634756 
+N 2.3750313100 1.3597507500 3.9327617692 
+N 1.7948709900 3.1727517500 1.9341094668 
+N 3.6078719900 1.3597507500 2.5142697868 
+N 4.1880323100 3.1727517500 4.5129220892 
+

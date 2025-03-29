@@ -1,0 +1,53 @@
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                            Results for TENSILE_X                     ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform DFT simulations                  ❤
+❤                Calculations started at 12:37:34 on 2024-06-16        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++-====================================================================-+
+|                    This is a 2D lattice                              |
++-====================================================================-+
+                             Ultimate strain (ε) = 0.210                             
+                         Ultimate strength (σ_s) = 36.672 N/m                        
+                          Yield Strength (σ_y) = 17.684 N/m                          
+                         Stiffness (K) = 4553.567  (E-A) N/m                         
+                          Stiffness (K) = 300.797 (P-A) N/m                          
+                                      Bp = 8.247                                     
+                             Stiffness (E) = 303.360 N/m                             
+                           Thickness of material = 3.430 Å                           
+                            Resilience (U_r) = 0.155 J/m^3                           
+                            Toughness (U_r) = 1.900 J/m^3                            
+                      Energy storage capacity (E_c) = 5.613 MJ/L                     
+                    Energy storage capacity (E_c) = 706.082 Wh/Kg                    
+                              Ductility (%D) = 21.000 %                              
+                          Ductility Index (%DI) = 250.000 %                          
+                             Poisson's ratio (v) = 0.332                             
+                           Shear modulus (G) = 113.881 N/m                           
+                    Longitudinal sound velocity (V_l) = 23.400 m/s                   
+                       Shear sound velocity (V_s) = 12.263 m/s                       
+                        Mean sound velocity (V_m) = 15.361 m/s                       
+                          Pwave velocity (V_p) = 24.448 m/s                          
+                         Debye temperature (T_D) = 2562.512 K                        
+                     First Lamé parameter (lambda) = 224.876 N/m                     
+                       Second Lamé parameter (mu) = 113.881 N/m                      
+                         Grüneisen parameter (gamma) = 1.989                         
+                    Min thermal Conductivity (Slack) = 5.907 W/mK                    
+                    Min thermal Conductivity (Clarke) = 4.565 W/mK                   
+                   Min thermal  Conductivity (Cahill) = 12.701 W/mK                  
+               Integrated min thermal Conductivity (Slack) = 1.493 W/mK              
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+|              SMATool: Strength of materials analysis toolkit,                |
+|                                 C.E. Ekuma,                                  |
+|             Computer Physics Communications 300, 109189, (2024)              |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|          for tensile and indent strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+

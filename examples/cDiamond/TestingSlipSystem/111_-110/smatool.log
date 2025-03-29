@@ -1,0 +1,114 @@
+2024-05-29 14:45:43 - INFO - SMATool calculation started at 14:45:43 on 2024-05-29
+2024-05-29 14:45:43 - INFO - ==================================
+2024-05-29 14:45:43 - INFO - Input file used in calculation:
+2024-05-29 14:45:43 - INFO - code_type: VASP
+2024-05-29 14:45:43 - INFO - use_saved_data: False
+2024-05-29 14:45:43 - INFO - use_dnn_gan: False
+2024-05-29 14:45:43 - INFO - strains: 0.01 0.8 0.01
+2024-05-29 14:45:43 - INFO - yieldpoint_offset: 0.002
+2024-05-29 14:45:43 - INFO - nlayers: 1
+2024-05-29 14:45:43 - INFO - vdwgap: 3.5
+2024-05-29 14:45:43 - INFO - dimensional: 3D
+2024-05-29 14:45:43 - INFO - mode: DFT
+2024-05-29 14:45:43 - INFO - scrystal: cubic
+2024-05-29 14:45:43 - INFO - plusminus: False
+2024-05-29 14:45:43 - INFO - use_schmid_factors: False
+2024-05-29 14:45:43 - INFO - components: ['indent_strength']
+2024-05-29 14:45:43 - INFO - md_supercell: [1, 1, 1]
+2024-05-29 14:45:43 - INFO - md_timestep: 2.0
+2024-05-29 14:45:43 - INFO - indent_radius: 0.5
+2024-05-29 14:45:43 - INFO - custom_options: {'potential_dir': '/home/chineduekuma/codes/vasp/PBE'}
+2024-05-29 14:45:43 - INFO - job_submit_command: mpirun -n 2 vasp_std > log
+2024-05-29 14:45:43 - INFO - structure_file: C.cif
+2024-05-29 14:45:43 - INFO - rotation: False
+2024-05-29 14:45:43 - INFO - save_struct: True
+2024-05-29 14:45:43 - INFO - slipon: True
+2024-05-29 14:45:43 - INFO - slip_parameters: 111, -110
+2024-05-29 14:45:43 - INFO - Input parameters from smatool.in ends
+2024-05-29 14:45:43 - INFO - ==================================
+2024-05-29 14:45:43 - INFO - Active component is: {component}
+2024-05-29 14:45:43 - INFO - indentation_depth: -0.032369314209578004
+2024-05-29 14:46:00 - INFO - Strain:  0.0100, Stress:  0.5224
+2024-05-29 14:46:00 - INFO - indentation_depth: -0.04855397131436723
+2024-05-29 14:46:15 - INFO - Strain:  0.0150, Stress:  0.7940
+2024-05-29 14:46:15 - INFO - indentation_depth: -0.06473862841915601
+2024-05-29 14:46:32 - INFO - Strain:  0.0200, Stress:  1.0708
+2024-05-29 14:46:32 - INFO - indentation_depth: -0.09710794262873401
+2024-05-29 14:46:52 - INFO - Strain:  0.0300, Stress:  1.6448
+2024-05-29 14:46:52 - INFO - indentation_depth: -0.12947725683831202
+2024-05-29 14:47:13 - INFO - Strain:  0.0400, Stress:  2.2442
+2024-05-29 14:47:13 - INFO - indentation_depth: -0.16184657104789002
+2024-05-29 14:47:35 - INFO - Strain:  0.0500, Stress:  2.8649
+2024-05-29 14:47:35 - INFO - indentation_depth: -0.19421588525746802
+2024-05-29 14:47:57 - INFO - Strain:  0.0600, Stress:  3.5096
+2024-05-29 14:47:57 - INFO - indentation_depth: -0.22658519946704647
+2024-05-29 14:48:19 - INFO - Strain:  0.0700, Stress:  4.1761
+2024-05-29 14:48:19 - INFO - indentation_depth: -0.25895451367662403
+2024-05-29 14:48:46 - INFO - Strain:  0.0800, Stress:  4.8818
+2024-05-29 14:48:46 - INFO - indentation_depth: -0.29132382788620204
+2024-05-29 14:49:13 - INFO - Strain:  0.0900, Stress:  5.5962
+2024-05-29 14:49:13 - INFO - indentation_depth: -0.32369314209578004
+2024-05-29 14:49:40 - INFO - Strain:  0.1000, Stress:  6.3371
+2024-05-29 14:49:40 - INFO - indentation_depth: -0.35606245630535804
+2024-05-29 14:50:08 - INFO - Strain:  0.1100, Stress:  7.0965
+2024-05-29 14:50:08 - INFO - indentation_depth: -0.38843177051493605
+2024-05-29 14:50:36 - INFO - Strain:  0.1200, Stress:  7.8752
+2024-05-29 14:50:36 - INFO - indentation_depth: -0.42080108472451405
+2024-05-29 14:51:03 - INFO - Strain:  0.1300, Stress:  8.6746
+2024-05-29 14:51:03 - INFO - indentation_depth: -0.45317039893409206
+2024-05-29 14:51:30 - INFO - Strain:  0.1400, Stress:  9.4928
+2024-05-29 14:51:30 - INFO - indentation_depth: -0.48553971314367006
+2024-05-29 14:51:58 - INFO - Strain:  0.1500, Stress:  10.3291
+2024-05-29 14:51:58 - INFO - indentation_depth: -0.5179090273532481
+2024-05-29 14:52:28 - INFO - Strain:  0.1600, Stress:  11.1808
+2024-05-29 14:52:28 - INFO - indentation_depth: -0.5502783415628261
+2024-05-29 14:52:59 - INFO - Strain:  0.1700, Stress:  12.0500
+2024-05-29 14:52:59 - INFO - indentation_depth: -0.5826476557724041
+2024-05-29 14:53:26 - INFO - Strain:  0.1800, Stress:  12.9348
+2024-05-29 14:53:26 - INFO - indentation_depth: -0.6150169699819821
+2024-05-29 14:53:54 - INFO - Strain:  0.1900, Stress:  13.8338
+2024-05-29 14:53:54 - INFO - indentation_depth: -0.6473862841915601
+2024-05-29 14:54:26 - INFO - Strain:  0.2000, Stress:  14.7337
+2024-05-29 14:54:26 - INFO - indentation_depth: -0.6797555984011381
+2024-05-29 14:54:55 - INFO - Strain:  0.2100, Stress:  15.6737
+2024-05-29 14:54:55 - INFO - indentation_depth: -0.7121249126107161
+2024-05-29 14:55:29 - INFO - Strain:  0.2200, Stress:  17.1850
+2024-05-29 14:55:29 - INFO - indentation_depth: -0.7444942268202941
+2024-05-29 14:56:04 - INFO - Strain:  0.2300, Stress:  20.8488
+2024-05-29 14:56:04 - INFO - indentation_depth: -0.7768635410298721
+2024-05-29 14:56:40 - INFO - Strain:  0.2400, Stress:  22.7372
+2024-05-29 14:56:40 - INFO - indentation_depth: -0.8092328552394501
+2024-05-29 14:57:15 - INFO - Strain:  0.2500, Stress:  23.5981
+2024-05-29 14:57:15 - INFO - indentation_depth: -0.8416021694490281
+2024-05-29 14:57:51 - INFO - Strain:  0.2600, Stress:  24.4180
+2024-05-29 14:57:51 - INFO - indentation_depth: -0.8739714836586061
+2024-05-29 14:58:26 - INFO - Strain:  0.2700, Stress:  25.2026
+2024-05-29 14:58:26 - INFO - indentation_depth: -0.9063407978681841
+2024-05-29 14:59:01 - INFO - Strain:  0.2800, Stress:  25.7431
+2024-05-29 14:59:01 - INFO - indentation_depth: -0.9387101120777626
+2024-05-29 14:59:37 - INFO - Strain:  0.2900, Stress:  25.2136
+2024-05-29 14:59:37 - INFO - indentation_depth: -0.9710794262873406
+2024-05-29 15:00:12 - INFO - Strain:  0.3000, Stress:  25.3339
+2024-05-29 15:00:12 - INFO - indentation_depth: -1.0034487404969186
+2024-05-29 15:00:50 - INFO - Strain:  0.3100, Stress:  25.8628
+2024-05-29 15:00:50 - INFO - indentation_depth: -1.0358180547064966
+2024-05-29 15:01:27 - INFO - Strain:  0.3200, Stress:  27.0390
+2024-05-29 15:01:27 - INFO - indentation_depth: -1.0681873689160746
+2024-05-29 15:02:08 - INFO - Strain:  0.3300, Stress:  22.2287
+2024-05-29 15:02:08 - INFO - indentation_depth: -1.1005566831256526
+2024-05-29 15:02:47 - INFO - Strain:  0.3400, Stress:  21.7503
+2024-05-29 15:02:47 - INFO - indentation_depth: -1.1329259973352306
+2024-05-29 15:03:23 - INFO - Strain:  0.3500, Stress:  21.2690
+2024-05-29 15:03:23 - INFO - indentation_depth: -1.1652953115448086
+2024-05-29 15:04:01 - INFO - 
+2024-05-29 15:04:01 - INFO - Results are saved in the various component files
+2024-05-29 15:04:01 - INFO - SMATool general output is in smatool.out
+2024-05-29 15:04:01 - INFO - Enthalpy information is in enthalpy.dat
+2024-05-29 15:04:01 - INFO - Schmid factor saved in schmid_factor.dat
+2024-05-29 15:04:01 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-05-29 15:04:01 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-05-29 15:04:01 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-05-29 15:04:01 - INFO - 
+2024-05-29 15:04:01 - INFO - Calculation done in 1098.06
+2024-05-29 15:04:01 - INFO - Well done! GOOD LUCK!
+2024-05-29 15:04:01 - INFO - SMATool calculation Ended at 15:04:01 on 2024-05-29

@@ -1,0 +1,117 @@
+Copied POTCAR for C to potentials/potpaw_PBE/C
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                            Results for Tensile_x                     ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform MD simulations                   ❤
+❤                Calculations started at 14:01:29 on 2024-01-06        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+       Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+LBFGS:    0 14:01:40      -19.369772*       0.0000
+DFT Optimization Done!
+Equilibration Done!
+Calculating for Tensile_x component.
+Performing additional thermal stress-strain calculation
+Strain:  0.0100, Stress:  0.0000
+Performing additional thermal stress-strain calculation
+Strain:  0.0150, Stress:  1.8246
+Performing additional thermal stress-strain calculation
+Strain:  0.0200, Stress:  3.4544
+Performing additional thermal stress-strain calculation
+Strain:  0.0300, Stress:  6.5123
+Performing additional thermal stress-strain calculation
+Strain:  0.0400, Stress:  9.4730
+Performing additional thermal stress-strain calculation
+Strain:  0.0500, Stress:  12.5471
+Performing additional thermal stress-strain calculation
+Strain:  0.0600, Stress:  15.0483
+Performing additional thermal stress-strain calculation
+Strain:  0.0700, Stress:  17.2137
+Performing additional thermal stress-strain calculation
+Strain:  0.0800, Stress:  19.5433
+Performing additional thermal stress-strain calculation
+Strain:  0.0900, Stress:  21.5764
+Performing additional thermal stress-strain calculation
+Strain:  0.1000, Stress:  23.5877
+Performing additional thermal stress-strain calculation
+Strain:  0.1100, Stress:  25.7610
+Performing additional thermal stress-strain calculation
+Strain:  0.1200, Stress:  27.0026
+Performing additional thermal stress-strain calculation
+Strain:  0.1300, Stress:  29.0067
+Performing additional thermal stress-strain calculation
+Strain:  0.1400, Stress:  30.2762
+Performing additional thermal stress-strain calculation
+Strain:  0.1500, Stress:  31.3621
+Performing additional thermal stress-strain calculation
+Strain:  0.1600, Stress:  32.6238
+Performing additional thermal stress-strain calculation
+Strain:  0.1700, Stress:  33.2571
+Performing additional thermal stress-strain calculation
+Strain:  0.1800, Stress:  34.5162
+Performing additional thermal stress-strain calculation
+Strain:  0.1900, Stress:  35.1083
+Performing additional thermal stress-strain calculation
+Strain:  0.2000, Stress:  35.5897
+Performing additional thermal stress-strain calculation
+Strain:  0.2100, Stress:  35.8557
+Performing additional thermal stress-strain calculation
+Strain:  0.2200, Stress:  36.1952
+Performing additional thermal stress-strain calculation
+Strain:  0.2300, Stress:  37.1496
+Performing additional thermal stress-strain calculation
+Strain:  0.2400, Stress:  36.7248
+Performing additional thermal stress-strain calculation
+Strain:  0.2500, Stress:  37.0735
+Performing additional thermal stress-strain calculation
+Strain:  0.2600, Stress:  36.7688
+Performing additional thermal stress-strain calculation
+Strain:  0.2700, Stress:  36.7346
+Performing additional thermal stress-strain calculation
+Strain:  0.2800, Stress:  35.5344
+Performing additional thermal stress-strain calculation
+Strain:  0.2900, Stress:  36.2397
+Performing additional thermal stress-strain calculation
+Strain:  0.3000, Stress:  35.9924
+Performing additional thermal stress-strain calculation
+Strain:  0.3100, Stress:  36.0473
+Performing additional thermal stress-strain calculation
+Current stress value is more than 20% smaller than the previous value. Exiting calculations.
+Warning: Yield strength is non-positive. Returning maximum stress as heuristic yield strength.
+Thickness for C already exists. Using existing thickness: 3.43 Å.
+Estimated yield and Tensile_x strengths are:  37.15 N/m and 37.15 N/m 
+Energy Storage Capacity at max strain 0.230 is 1.557 MJ/L or 193.741 Wh/Kg
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤            Results are written in MD_struct_Tensile_x.ss             ❤
+❤                      and structure information                       ❤
+❤                   at each stress and strain saved                    ❤
+❤                    in MD_Tensile_x_strength.dat.                     ❤
+❤       Job finished at 13:41:31 on 2024-01-07 using 85202.04 s        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
++------------------------------------------------------------------------------+
+|                                 * CITATIONS *                                |
+| ---------------------------------------------------------------------------- |
+|           If you have used SMATool in your research, PLEASE cite:            |
+|                                                                              |
+| SMATool: An automated toolkit for tensile and ideal strengths of materials,  |
+|                          C.E. Ekuma and Z.-L. Liu,                           |
+|               Computer Physics Communications xxx, xxx, (2024)               |
+|                                                                              |
+|                                                                              |
+|        Material strength analyzer: Python-based computational toolkit        |
+|           for tensile and ideal strength of materials, C.E. Ekuma,           |
+|                        www.github.com/gmp007/smatool                         |
++------------------------------------------------------------------------------+
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+❤                              Results for Shear                       ❤
+❤                                    using                             ❤
+❤                             SMATool Version: 1.0                     ❤
+❤                       VASP code is used as a calculator              ❤
+❤                          to perform MD simulations                   ❤
+❤                Calculations started at 13:41:31 on 2024-01-07        ❤
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+       Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+LBFGS:    0 13:41:39      -19.369772*       0.0000

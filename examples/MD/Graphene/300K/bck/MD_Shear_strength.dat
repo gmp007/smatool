@@ -1,0 +1,42 @@
+# Strain	Stress (N/m)	Mean Volume (A^3)	Mean Energy(eV)	Mean Temperature (K)	Mean Pressure (N/m)
+0.0	0.0	0.0	0.0	0.0	0.0
+0.000000	0.000000	0.000000	0.000000	0.000000	0.000000
+0.010000	2.353151	421.314846	-74.115015	311.588333	-0.155068
+0.015000	3.862637	421.314846	-74.082154	302.403667	-0.164638
+0.020000	5.368386	421.314846	-74.032696	306.817667	-0.177375
+0.030000	8.553461	421.314846	-73.884841	312.799000	-0.200692
+0.040000	11.562482	421.314846	-73.518116	407.485000	-0.215249
+0.050000	14.606892	421.314846	-73.249076	276.518000	-0.164570
+0.060000	17.849293	421.314846	-72.831031	315.033667	-0.254268
+0.070000	20.534085	421.314846	-72.297958	283.442000	-0.268960
+0.080000	23.590560	421.314846	-71.803380	273.105000	-0.314988
+0.090000	26.860182	421.314846	-71.154480	322.737333	-0.286347
+0.100000	29.549437	421.314846	-70.256120	321.548000	-0.275429
+0.110000	31.781009	421.314846	-69.569297	328.347667	-0.257571
+0.120000	33.283354	421.314846	-68.741268	265.428667	-0.431913
+# Energy Storage Capacity at max strain 0.1200 is 2.911 MJ/L or 366.188 Wh/Kg, Thickness 3.43 Å 
+# Estimated Young modulus (E) is 301.252099 N/m
+# Estimated Stiffness constant (E-A) (K) is 160.217662 N/m
+# Estimated Stiffness constant (P-A) (K) is 0.000000 N/m
+# Estimated Bp (E-A) (K) is 1.000000 
+# Estimated Bp (P-A) (K) is 0.000000 
+# Estimated Yield strength using 0.002 offset is 29.549437 N/m
+# Estimated Shear modulus (G) is -0.000000 N/m
+# Estimated First Lamé parameter (lambda) is nan N/m
+# Estimated Second Lamé parameter (mu) is -0.000000 N/m
+# Estimated Resilience is 0.430750 J/m^3
+# Estimated Toughness is 0.610063 J/m^3
+# Estimated Ductility(%) is 12.000 %
+# Estimated Ductility Index(%) is 20.000 %
+# Estimated Poisson's ratio (v) is -inf 
+# Estimated Grüneisen parameter (gamma) is nan
+# Estimated Longitudinal sound velocity (V_l) is 0.000000 km/s
+# Estimated Shear sound velocity (V_s) is 0.000000 km/s
+# Estimated Mean sound velocity (V_m) is 0.000000 km/s
+# Estimated Pwave velocity (V_p) is 0.000000 km/s
+# Estimated Debye temperature (T_D) is 0.000000 K
+# Estimated Min thermal Conductivity (Slack) is nan W/mK
+# Estimated Min thermal  Conductivity (Clarke) is 4.548949 W/mK
+# Estimated Min thermal  Conductivity (Cahill) is 0.000000 W/mK
+# Estimated Integrated min thermal  Conductivity (Slack) is nan W/mK
+# Shear ultimate strength: 33.283354 N/m

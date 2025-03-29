@@ -1,0 +1,41 @@
+2024-06-16 12:37:31 - INFO - SMATool calculation started at 12:37:31 on 2024-06-16
+2024-06-16 12:37:31 - INFO - ==================================
+2024-06-16 12:37:31 - INFO - Input file used in calculation:
+2024-06-16 12:37:31 - INFO - code_type: VASP
+2024-06-16 12:37:31 - INFO - use_saved_data: True
+2024-06-16 12:37:31 - INFO - use_dnn_gan: False
+2024-06-16 12:37:31 - INFO - strains: 0.01 0.8 0.01
+2024-06-16 12:37:31 - INFO - yieldpoint_offset: 0.002
+2024-06-16 12:37:31 - INFO - nlayers: 1
+2024-06-16 12:37:31 - INFO - vdwgap: 3.5
+2024-06-16 12:37:31 - INFO - dimensional: 2D
+2024-06-16 12:37:31 - INFO - mode: DFT
+2024-06-16 12:37:31 - INFO - scrystal: cubic
+2024-06-16 12:37:31 - INFO - plusminus: False
+2024-06-16 12:37:31 - INFO - use_schmid_factors: False
+2024-06-16 12:37:31 - INFO - components: ['Tensile_x']
+2024-06-16 12:37:31 - INFO - md_supercell: [1, 1, 1]
+2024-06-16 12:37:31 - INFO - md_timestep: 500.0
+2024-06-16 12:37:31 - INFO - indent_radius: 2.0
+2024-06-16 12:37:31 - INFO - custom_options: {'potential_dir': '/home/chineduekuma/codes/vasp/PBE'}
+2024-06-16 12:37:31 - INFO - job_submit_command: mpirun -n 2 vasp_std > log
+2024-06-16 12:37:31 - INFO - structure_file: graphene.vasp
+2024-06-16 12:37:31 - INFO - rotation: True
+2024-06-16 12:37:31 - INFO - save_struct: True
+2024-06-16 12:37:31 - INFO - slipon: True
+2024-06-16 12:37:31 - INFO - slip_parameters: 100, 1-11
+2024-06-16 12:37:31 - INFO - Input parameters from smatool.in ends
+2024-06-16 12:37:31 - INFO - ==================================
+2024-06-16 12:37:34 - ERROR - An error occurred: name 'K_Slack' is not defined
+2024-06-16 12:37:34 - INFO - 
+2024-06-16 12:37:34 - INFO - Results are saved in the various component files
+2024-06-16 12:37:34 - INFO - SMATool general output is in smatool.out
+2024-06-16 12:37:34 - INFO - Enthalpy information is in enthalpy.dat
+2024-06-16 12:37:34 - INFO - Schmid factor saved in schmid_factor.dat
+2024-06-16 12:37:34 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-06-16 12:37:34 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-06-16 12:37:34 - INFO - Yield strength profile saved in the smatool_plots folder
+2024-06-16 12:37:34 - INFO - 
+2024-06-16 12:37:34 - INFO - Calculation done in 3.36
+2024-06-16 12:37:34 - INFO - Well done! GOOD LUCK!
+2024-06-16 12:37:34 - INFO - SMATool calculation Ended at 12:37:34 on 2024-06-16

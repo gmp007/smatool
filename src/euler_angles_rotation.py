@@ -11,7 +11,6 @@
   Email: cekuma1@gmail.com
 """ 
 
-
 import numpy as np
 import spglib
 import math
@@ -19,13 +18,21 @@ import itertools
 from read_write import read_options_from_input
 
 options = read_options_from_input()
-slipon = options.get("slipon",False)
-def calculate_euler_angles(hkl,dim,atoms):
+slipon = options.get("slipon", False)
 
-    # Determine the space group
-    spg = spglib.get_spacegroup(atoms,symprec=0.1)
+def slip_systems(hkl, dim, atoms):
+    try:
+        lattice = atoms.get_cell()  # Lattice vectors
+        positions = atoms.get_scaled_positions()  # Scaled positions
+        numbers = atoms.get_atomic_numbers()  # Atomic numbers
+        cell = (lattice, positions, numbers)
+        spg = spglib.get_spacegroup(cell, symprec=0.1)
+    except Exception as e:
+        raise RuntimeError(f"Error determining space group: {e}")
+
+    # Extract the space group number
     spg_number = int(spg.split()[1].strip('()'))
-    phi = phi2 = None 
+    phi = phi1 = phi2 = None 
 
     if 1 <= spg_number <= 2:
         crystal_system = "triclinic"
@@ -44,49 +51,37 @@ def calculate_euler_angles(hkl,dim,atoms):
     else:
         crystal_system = "unknown"  
 
-    if dim =="3D" or dim == "1D":
-
+    if dim == "3D" or dim == "1D":
         h, k, l = hkl
 
         if crystal_system == 'cubic':
-
             norm = np.sqrt(h**2 + k**2 + l**2)
             a_cos = h / norm
             b_cos = k / norm
             c_cos = l / norm
 
-
-            x = a_cos * b_cos + c_cos * (-np.sqrt(1 - a_cos**2))
-            y = b_cos * c_cos + a_cos * (-np.sqrt(1 - b_cos**2))
-
-            phi1 = np.arctan2(y, x) * 180 / np.pi
+            # Euler angles for cubic crystals
+            phi1 = np.arctan2(b_cos, a_cos) * 180 / np.pi
             phi = np.arccos(c_cos) * 180 / np.pi
-            phi2 = np.arctan2(a_cos * (-np.sqrt(1 - c_cos**2)) - b_cos * c_cos,
-                              np.sqrt(1 - a_cos**2 - b_cos**2)) * 180 / np.pi
+            phi2 = 0.0  # For cubic crystals, the third angle can be set to zero
 
         elif crystal_system == 'hexagonal':
-
             a_comp = np.sqrt(3) * k / 2
             c_comp = l
 
             phi1 = np.arctan2(a_comp, h) * 180 / np.pi
-
             phi = np.arccos(c_comp / np.sqrt(h**2 + k**2 + l**2)) * 180 / np.pi
-
             phi2 = phi1 + 120 * np.round((phi1 - 30) / 120)
 
         elif crystal_system == 'trigonal':
-
             a_comp = (2 * k - h) / np.sqrt(3)
             c_comp = l
-
 
             phi1 = np.arctan2(a_comp, np.sqrt(3) * h) * 180 / np.pi
             phi = np.arccos(c_comp / np.sqrt(h**2 + k**2 + l**2)) * 180 / np.pi
             phi2 = phi1 + 120 * np.round((phi1 - 30) / 120)
 
         elif crystal_system == 'tetragonal':
-
             a_comp = np.sqrt(h**2 + k**2)
             c_comp = l
 
@@ -95,7 +90,6 @@ def calculate_euler_angles(hkl,dim,atoms):
             phi2 = phi1 + 180 * np.round((phi1 - 90) / 180)
 
         elif crystal_system == 'orthorhombic':
-
             norm = np.sqrt(h**2 + k**2 + l**2)
 
             a_cos = h / norm
@@ -118,241 +112,209 @@ def calculate_euler_angles(hkl,dim,atoms):
             beta = np.arccos(b_cos) * 180 / np.pi
 
             x_bar = a_cos * np.cos(beta) + c_cos * np.sin(beta)
-            y_bar = k / norm
+            y_bar = b_cos
             z_bar = -a_cos * np.sin(beta) + c_cos * np.cos(beta)
 
             phi1 = np.arctan2(y_bar, x_bar) * 180 / np.pi
-            phi2 = np.arctan2(np.sqrt(1 - y_bar**2), y_bar) * 180 / np.pi
             phi = np.arccos(z_bar) * 180 / np.pi
+            phi2 = 0.0  # Simplification
 
         elif crystal_system == 'triclinic':
-
-            norm = np.sqrt(h**2 + k**2 + l**2)
-            a_cos = h / norm
-            b_cos = k / norm
-            c_cos = l / norm
-
-            x = a_cos * b_cos * c_cos - c_cos * np.sqrt(1 - a_cos**2) * np.sqrt(1 - b_cos**2)
-            y = a_cos * np.sqrt(1 - c_cos**2) + b_cos * c_cos * np.sqrt(1 - a_cos**2)
-            z = -b_cos * np.sqrt(1 - c_cos**2) + a_cos * c_cos * np.sqrt(1 - b_cos**2)
-
-            phi1 = np.arctan2(y, x) * 180 / np.pi
-            phi = np.arccos(z) * 180 / np.pi
-            phi2 = np.arctan2(a_cos * c_cos * np.sqrt(1 - b_cos**2) - b_cos * np.sqrt(1 - a_cos**2),
-                                b_cos * c_cos * np.sqrt(1 - a_cos**2) + a_cos * np.sqrt(1 - b_cos**2)) * 180 / np.pi
-
+            # For triclinic systems, Euler angles can be complex to calculate
+            raise NotImplementedError("Euler angle calculation for triclinic systems is not implemented.")
         else:
             raise ValueError("Unsupported crystal system.")
 
-    elif dim =="2D":
-        
-        if len(hkl) > 2:
-            print("Warning: Only 'h' and 'k' values are used for 2D crystal systems. Please ensure this is correct.")
-        h, k = hkl
-    
-        if crystal_system == 'hexagonal':
+    elif dim == "2D":
+        phi1 = phi = phi2 = 0.0
+        h, k = hkl[:2]
 
+        if crystal_system == 'hexagonal':
             norm = np.sqrt(h**2 + k**2)
-            a_cos = h / norm
             phi1 = np.arctan2(np.sqrt(3) * k / 2, h) * 180 / np.pi
 
-        if crystal_system == 'tetragonal':
-
-            a_comp = np.sqrt(h**2 + k**2)
-
+        elif crystal_system == 'tetragonal' or crystal_system == 'orthorhombic':
             phi1 = np.arctan2(k, h) * 180 / np.pi
 
-            #phi2 = phi1 + 90 * np.round((phi1 - 45) / 90)
-        if crystal_system == 'trigonal':
-
+        elif crystal_system == 'trigonal':
             a_comp = (2 * k - h) / np.sqrt(3)
-            c_comp = l
-
-            # Calculate in-plane angle phi1
             phi1 = np.arctan2(a_comp, np.sqrt(3) * h) * 180 / np.pi
-
         else:
-
-            a_comp = np.sqrt(h**2 + k**2)
             phi1 = np.arctan2(k, h) * 180 / np.pi
-
     else:
         raise ValueError("Invalid dimensionality. Please specify '1D', '2D', or '3D'.")
 
-
     return phi1, phi, phi2
-    
-
-
 
 def apply_rotation(matrix, alpha, beta, gamma):
     """
     Applies a rotation to a matrix.
-
     Args:
       matrix: A 2D NumPy array representing the points to rotate.
       alpha: Rotation angle around the Z-axis in degrees.
       beta: Rotation angle around the Y-axis in degrees.
       gamma: Rotation angle around the X-axis in degrees.
-
     Returns:
       The rotated matrix.
     """
     # Convert angles from degrees to radians
-    alpha, beta, gamma = np.radians([alpha, beta, gamma])
+    alpha_rad, beta_rad, gamma_rad = np.radians([alpha, beta, gamma])
 
     # Rotation matrices
-    Rz = np.array([[math.cos(alpha), -math.sin(alpha), 0],
-                   [math.sin(alpha), math.cos(alpha), 0],
+    Rz = np.array([[math.cos(alpha_rad), -math.sin(alpha_rad), 0],
+                   [math.sin(alpha_rad), math.cos(alpha_rad), 0],
                    [0, 0, 1]])
-    Ry = np.array([[math.cos(beta), 0, math.sin(beta)],
+    Ry = np.array([[math.cos(beta_rad), 0, math.sin(beta_rad)],
                    [0, 1, 0],
-                   [-math.sin(beta), 0, math.cos(beta)]])
+                   [-math.sin(beta_rad), 0, math.cos(beta_rad)]])
     Rx = np.array([[1, 0, 0],
-                   [0, math.cos(gamma), -math.sin(gamma)],
-                   [0, math.sin(gamma), math.cos(gamma)]])
+                   [0, math.cos(gamma_rad), -math.sin(gamma_rad)],
+                   [0, math.sin(gamma_rad), math.cos(gamma_rad)]])
 
-    # Apply rotations
-    rotated_matrix = np.dot(matrix, Rz)
-    rotated_matrix = np.dot(rotated_matrix, Ry)
-    rotated_matrix = np.dot(rotated_matrix, Rx)
+    # Combined rotation matrix
+    R = Rz @ Ry @ Rx
+
+    # Apply rotation
+    rotated_matrix = matrix @ R.T  # Transpose R to apply rotation correctly
 
     return rotated_matrix
 
-
-
-def rotate(pos, alpha, beta, gamma):
-    with open(pos) as f:
-        lines = f.readlines()
-
-    # Extract lattice vectors
-    lattice_vectors = np.array([list(map(float, line.split())) for line in lines[2:5]])
-
-    # Convert angles from degrees to radians
-    alpha, beta, gamma = np.radians([alpha, beta, gamma])
-
-    # Rotation matrices
-    Rz = np.array([[math.cos(alpha), -math.sin(alpha), 0],
-                   [math.sin(alpha), math.cos(alpha), 0],
-                   [0, 0, 1]])
-    Ry = np.array([[math.cos(beta), 0, math.sin(beta)],
-                   [0, 1, 0],
-                   [-math.sin(beta), 0, math.cos(beta)]])
-    Rx = np.array([[1, 0, 0],
-                   [0, math.cos(gamma), -math.sin(gamma)],
-                   [0, math.sin(gamma), math.cos(gamma)]])
-
-    # Apply rotations
-    rotated_vectors = np.dot(lattice_vectors, Rz)
-    rotated_vectors = np.dot(rotated_vectors, Ry)
-    rotated_vectors = np.dot(rotated_vectors, Rx)
-    print(rotated_vectors)
-    # Write to file
-    with open("POSCAR_rotated", 'w') as f:
-        f.writelines(lines[:2])
-        for vec in rotated_vectors:
-            f.write(' '.join(map(str, vec)) + '\n')
-        f.writelines(lines[5:])
-        
-        
-    
-def rotate_crystal_structure(poscar_file, strain_direction, slip_direction, dim, atoms,slipon):
-    strain_alpha, strain_beta, strain_gamma = calculate_euler_angles(strain_direction, dim, atoms)
-    print(f"Euler Angles for the Strain Direction: alpha:{strain_alpha:.3f}, beta:{strain_beta:.3f}, gamma:{strain_gamma:.3f}" )
+def rotate_crystal_structure(poscar_file, strain_direction, slip_direction, dim, atoms, slipon):
+    strain_alpha, strain_beta, strain_gamma = slip_systems(strain_direction, dim, atoms)
+    print(f"Euler Angles for the Strain Direction: alpha: {strain_alpha:.3f}, beta: {strain_beta:.3f}, gamma: {strain_gamma:.3f}")
     if slipon:
-        slip_alpha, slip_beta, slip_gamma = calculate_euler_angles(slip_direction, dim, atoms)
-        print(f"Euler Angles for the Slip Direction: alpha:{slip_alpha:.3f}, beta:{slip_beta:.3f}, gamma:{slip_gamma:.3f}" )
+        slip_alpha, slip_beta, slip_gamma = slip_systems(slip_direction, dim, atoms)
+        print(f"Euler Angles for the Slip Direction: alpha: {slip_alpha:.3f}, beta: {slip_beta:.3f}, gamma: {slip_gamma:.3f}")
 
     with open(poscar_file, 'r') as file:
         lines = file.readlines()
 
-    lattice_vectors = np.array([list(map(float, line.split())) for line in lines[2:5]])
+    # Extract lattice vectors from POSCAR
+    lattice_vectors = np.array([list(map(float, line.strip().split())) for line in lines[2:5]])
 
+    # Ensure lattice vectors are 3D
+    if lattice_vectors.shape != (3, 3):
+        raise ValueError("Lattice vectors should be a 3x3 matrix.")
+
+    # Apply rotations
     lattice_vectors = apply_rotation(lattice_vectors, strain_alpha, strain_beta, strain_gamma)
     if slipon:
         lattice_vectors = apply_rotation(lattice_vectors, slip_alpha, slip_beta, slip_gamma)
 
-    
+    # Write the rotated structure to a new POSCAR file
     with open("POSCAR_rotated", 'w') as file:
         file.writelines(lines[:2])
         for vec in lattice_vectors:
-            file.write(' '.join(map(str, vec)) + '\n')
+            file.write('  {:.16f}  {:.16f}  {:.16f}\n'.format(*vec))
         file.writelines(lines[5:])
 
     print("Structure rotated and saved in VASP format as POSCAR_rotated.")
 
-
-
 def apply_rotation_2D(matrix, alpha):
-    pi = np.pi
-    alpha = float(alpha) * pi / 180  # Convert to radians
+    """
+    Applies a rotation around the z-axis in 2D.
+    """
+    alpha_rad = np.radians(alpha)
+    Rz = np.array([[math.cos(alpha_rad), -math.sin(alpha_rad)],
+                   [math.sin(alpha_rad), math.cos(alpha_rad)]])
 
-    # Rotate around z-axis in 2D
-    for i in range(len(matrix)):
-        x, y = matrix[i][0], matrix[i][1]
-        matrix[i][0] = x * math.cos(alpha) - y * math.sin(alpha)
-        matrix[i][1] = x * math.sin(alpha) + y * math.cos(alpha)
+    # Apply rotation
+    rotated_matrix = matrix @ Rz.T
 
-    return matrix
-    
-def rotate_crystal_structure_2D(poscar_file, strain_direction, slip_direction, dim, atoms,slipon):
-    strain_phi,_,_ = calculate_euler_angles(strain_direction, dim, atoms)
-    print(f"Euler Angle for Strain Direction. For 2D only z-rotation needed: gamma:{strain_phi:.3f}" )
+    return rotated_matrix
+
+def rotate_crystal_structure_2D(poscar_file, strain_direction, slip_direction, dim, atoms, slipon):
+    strain_phi, _, _ = slip_systems(strain_direction, dim, atoms)
+    print(f"Euler Angle for Strain Direction (2D rotation): gamma: {strain_phi:.3f}")
     if slipon:
-        slip_phi,_,_ =   calculate_euler_angles(slip_direction, dim, atoms)
-        print(f"Euler Angle for Slip Direction For 2D only z-rotation needed: gamma:{slip_phi:.3f}" )
+        slip_phi, _, _ = slip_systems(slip_direction, dim, atoms)
+        print(f"Euler Angle for Slip Direction (2D rotation): gamma: {slip_phi:.3f}")
 
-    
     with open(poscar_file, 'r') as file:
         lines = file.readlines()
 
-    lattice_vectors = np.array([list(map(float, line.split()))[:2] for line in lines[2:4]])
+    # Extract 2D lattice vectors (first two components)
+    lattice_vectors = np.array([list(map(float, line.strip().split()))[:2] for line in lines[2:4]])
+
+    # Apply rotations
     lattice_vectors = apply_rotation_2D(lattice_vectors, strain_phi)
-    
     if slipon:
         lattice_vectors = apply_rotation_2D(lattice_vectors, slip_phi)
 
+    # Write the rotated structure to a new POSCAR file
     with open("POSCAR_rotated", 'w') as f:
-        for line in lines[:2]:
-            f.write(line)
+        f.writelines(lines[:2])
         for vec in lattice_vectors:
-            f.write(f"{vec[0]:.6f} {vec[1]:.6f} 0.0\n")
-        for line in lines[4:]:
-            f.write(line)
-            
+            f.write(f"  {vec[0]:.16f}  {vec[1]:.16f}  0.0000000000000000\n")
+        f.writelines(lines[4:])
+
     print("Structure rotated and saved in VASP format as POSCAR_rotated.")
-    
+
+def get_cubic_crystal_type(spg_number):
+    """
+    Determine the cubic crystal type (FCC, BCC, SC) based on the space group number.
+    """
+    if 195 <= spg_number <= 199:
+        return "sc"  # Simple Cubic
+    elif 200 <= spg_number <= 206:
+        return "bcc"  # Body-Centered Cubic
+    elif 207 <= spg_number <= 230:
+        return "fcc"  # Face-Centered Cubic
+    else:
+        return "unknown"
+
+
 
 def generate_slip_systems_2d_hexagonal():
     """
-    We assume hexagonal for 2D materials
     Generate slip systems for a 2D hexagonal crystal system.
     :return: List of tuples containing normal vectors and slip directions in 2D
     """
-    # Define slip directions for 2D hexagonal system
-    # Assuming two primary slip directions for simplicity
-    directions = [(1, 0), (0, 1)]  # Example directions
+    # Define 2D hexagonal lattice vectors
+    a1 = np.array([1, 0])  # Along x-axis
+    a2 = np.array([0.5, np.sqrt(3)/2])  # 60 degrees from x-axis
 
-    # In 2D, the normal to the slip plane is not explicitly defined as in 3D
-    # For simplicity, we can assume the plane normal is perpendicular to the slip direction
+    # Slip directions are along the lattice vectors and their negatives
+    directions = [
+        a1,             # Along a1
+        a2,             # Along a2
+        -a1,            # Opposite to a1
+        -a2,            # Opposite to a2
+        a1 - a2,        # Along a3 = a1 - a2
+        -(a1 - a2)      # Opposite to a3
+    ]
+
+    # For 2D, the normal to the slip plane is perpendicular to the slip direction
     slip_systems = []
     for direction in directions:
-        normal_vector = (-direction[1], direction[0])  # Rotate by 90 degrees to get normal
-        slip_systems.append((normal_vector, direction))
+        # Normalize the slip direction
+        direction_norm = direction / np.linalg.norm(direction)
+        # Calculate the normal vector by rotating the slip direction by 90 degrees
+        normal_vector = np.array([-direction_norm[1], direction_norm[0]])
+        slip_systems.append((normal_vector, direction_norm))
 
     return slip_systems
-
 
 
 def generate_slip_systems(atoms):
     """
     Generate slip systems for specified crystal systems.
-    :param crystal_system: Type of crystal system ('cubic' or 'hexagonal')
+    :param atoms: ASE Atoms object
     :return: List of tuples containing normal vectors and slip directions
     """
     # Determine the space group
-    spg = spglib.get_spacegroup(atoms,symprec=0.1)
+    try:
+        lattice = atoms.get_cell()
+        positions = atoms.get_scaled_positions()
+        numbers = atoms.get_atomic_numbers()
+        cell = (lattice, positions, numbers)
+        spg = spglib.get_spacegroup(cell, symprec=0.1)
+    except Exception as e:
+        raise RuntimeError(f"Error determining space group: {e}")
+
+    # Extract the space group number
     spg_number = int(spg.split()[1].strip('()'))
+
     if 1 <= spg_number <= 2:
         crystal_system = "triclinic"
     elif 3 <= spg_number <= 15:
@@ -369,81 +331,147 @@ def generate_slip_systems(atoms):
         crystal_system = "cubic"
     else:
         crystal_system = "unknown"   
+
+    planes = []
+    directions = []
+
     if crystal_system == 'cubic':
-        # Define {111} planes and <110> directions for cubic crystals
-        planes = [(1, 1, 1), (-1, 1, 1), (1, -1, 1), (1, 1, -1)]
-        directions = [(1, 1, 0), (-1, 1, 0), (1, -1, 0), (1, 0, 1), (-1, 0, 1), (0, 1, 1), (0, -1, 1)]
+        crystal_type = get_cubic_crystal_type(spg_number)
+        if crystal_type == "fcc":
+            # FCC: {111} planes with <110> directions
+            planes = [(1, 1, 1), (-1, 1, 1), (1, -1, 1), (1, 1, -1)]
+            directions = [(1, 1, 0), (-1, 1, 0), (1, -1, 0), (1, 0, 1), (-1, 0, 1), (0, 1, 1), (0, -1, 1)]
+        elif crystal_type == "bcc":
+            # BCC: {110}, {112}, and {123} planes with <111> directions
+            planes = [(1, 1, 0), (1, 1, 2), (1, 2, 3)]
+            directions = [(1, 1, 1), (-1, 1, 1), (1, -1, 1), (-1, -1, 1)]
+        elif crystal_type == "sc":
+            # SC: {100} planes with <100> directions
+            planes = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
+            directions = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
+        else:
+            raise ValueError("Unsupported cubic crystal type: " + crystal_type)
 
-    elif crystal_system == 'hexagonal':
-        # Define basal, prismatic, and pyramidal planes and <11-20> directions for hexagonal crystals
-        basal_planes = [(0, 0, 1), (0, 0, -1)]
-        prismatic_planes = [(1, 0, -1), (-1, 0, 1), (0, 1, -1), (0, -1, 1)]
-        pyramidal_planes = [(1, 0, -1), (-1, 0, 1), (0, 1, -1), (0, -1, 1), (1, -1, 0), (-1, 1, 0)]
-        directions = [(1, 1, -2), (-1, -1, 2)]
-        planes = basal_planes + prismatic_planes + pyramidal_planes
-
-    elif crystal_system == 'triclinic':
-        # Triclinic crystals have no symmetry constraints, so defining slip systems is more complex and less standardized
-        # Define a range for indices to generate planes and directions
-        index_range = [-1, 0, 1]
-        # Generate all possible combinations of indices for planes and directions
-        planes = list(itertools.product(index_range, repeat=3))
-        directions = list(itertools.product(index_range, repeat=3))
-
-        # Remove the (0, 0, 0) vector as it's not valid for planes or directions
-        planes = [p for p in planes if p != (0, 0, 0)]
-        directions = [d for d in directions if d != (0, 0, 0)]
+    elif crystal_system == 'hexagonal' or crystal_system == 'trigonal':
+        # Basal planes and <a> directions
+        planes = [(0, 0, 1)]
+        directions = [(1, 0, 0), (0, 1, 0), (-1, -1, 0)]
 
     elif crystal_system == 'tetragonal':
-        planes = [(1, 1, 0), (1, -1, 0), (1, 0, 1), (0, 1, 1), (1, 1, 2), (1, -1, 2), (0, 0, 1)]
-        directions = [(1, 1, 1), (-1, 1, 1), (0, 0, 1)]
+        # {001} planes with <100> directions
+        planes = [(0, 0, 1)]
+        directions = [(1, 0, 0), (0, 1, 0)]
 
-    elif crystal_system == 'trigonal':
-        basal_planes = [(0, 0, 1), (0, 0, -1)]
-        prismatic_planes = [(1, 0, -1), (-1, 0, 1), (0, 1, -1), (0, -1, 1)]
-        pyramidal_planes = [(1, 0, -1), (-1, 0, 1), (0, 1, -1), (0, -1, 1), (1, -1, 0), (-1, 1, 0)]
-        directions = [(1, 1, -2), (-1, -1, 2)]
-        planes = basal_planes + prismatic_planes + pyramidal_planes
-    
     elif crystal_system == 'orthorhombic':
-        planes = [(1, 1, 0), (0, 1, 1), (1, 0, 1), (0, 0, 1)]
+        planes = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
         directions = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
 
     elif crystal_system == 'monoclinic':
+        planes = [(0, 1, 0)]
+        directions = [(1, 0, 0), (0, 0, 1)]
 
-        planes = [(1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 1, 0), (1, 0, 1), (0, 1, 1)]
-        directions = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
+    elif crystal_system == 'triclinic':
+        # For triclinic crystals, slip systems are not standardized
+        raise NotImplementedError("Slip system generation for triclinic systems is not implemented.")
 
     else:
         raise ValueError("Unsupported crystal system.")
 
     # Generate slip systems
-    slip_systems = []
+    slip_systems_list = []
     for plane in planes:
         for direction in directions:
-            if np.dot(plane, direction) == 0:  # Ensure the direction is within the plane
-                slip_systems.append((plane, direction))
+            plane_vector = np.array(plane)
+            direction_vector = np.array(direction)
+            # Ensure the direction is within the plane
+            if np.dot(plane_vector, direction_vector) == 0:
+                slip_systems_list.append((plane, direction))
 
-    return slip_systems,crystal_system
+    # Remove duplicates
+    slip_systems = list(set(slip_systems_list))
+    return slip_systems, crystal_system
 
+
+
+def rotate(pos, alpha, beta, gamma):
+    """
+    Rotates the lattice vectors in a POSCAR file by the specified Euler angles.
+
+    Args:
+        pos (str): Path to the POSCAR file.
+        alpha (float): Rotation angle around the Z-axis in degrees.
+        beta (float): Rotation angle around the Y-axis in degrees.
+        gamma (float): Rotation angle around the X-axis in degrees.
+    """
+    import numpy as np
+    import math
+
+    # Read the POSCAR file
+    with open(pos, 'r') as f:
+        lines = f.readlines()
+
+    # Extract lattice vectors from lines 3 to 5
+    lattice_vectors = np.array([list(map(float, line.strip().split())) for line in lines[2:5]])
+
+    # Ensure lattice vectors are 3D
+    if lattice_vectors.shape != (3, 3):
+        raise ValueError("Lattice vectors should be a 3x3 matrix.")
+
+    # Convert angles from degrees to radians
+    alpha_rad, beta_rad, gamma_rad = np.radians([alpha, beta, gamma])
+
+    # Rotation matrices
+    Rz = np.array([[math.cos(alpha_rad), -math.sin(alpha_rad), 0],
+                   [math.sin(alpha_rad),  math.cos(alpha_rad),  0],
+                   [0,                    0,                   1]])
+    Ry = np.array([[ math.cos(beta_rad), 0, math.sin(beta_rad)],
+                   [0,                   1, 0],
+                   [-math.sin(beta_rad), 0, math.cos(beta_rad)]])
+    Rx = np.array([[1, 0,                   0],
+                   [0, math.cos(gamma_rad), -math.sin(gamma_rad)],
+                   [0, math.sin(gamma_rad),  math.cos(gamma_rad)]])
+
+    # Combined rotation matrix
+    R = Rz @ Ry @ Rx  # Note: The order of multiplication matters
+
+    # Apply rotation to lattice vectors
+    rotated_vectors = lattice_vectors @ R.T
+
+    # Write the rotated lattice vectors back to a new POSCAR file
+    with open("POSCAR_rotated", 'w') as f:
+        # Write the first two lines unchanged
+        f.writelines(lines[:2])
+        # Write the rotated lattice vectors with high precision
+        for vec in rotated_vectors:
+            f.write('  {:.16f}  {:.16f}  {:.16f}\n'.format(*vec))
+        # Write the rest of the file unchanged
+        f.writelines(lines[5:])
+
+    print("Structure rotated and saved as 'POSCAR_rotated'.")
 
 
 def calculate_schmid_factor(normal_vector, slip_direction, stress_direction):
     """
     Calculate the Schmid factor for a given slip system.
-
     :param normal_vector: Normal vector to the slip plane (as a list or tuple of 3 elements)
     :param slip_direction: Slip direction (as a list or tuple of 3 elements)
     :param stress_direction: Direction of the applied stress (as a list or tuple of 3 elements)
     :return: Schmid factor for the given slip system
     """
- #   if len(stress_direction) != 3:
- #       print("Error: Strain direction must have 3 elements.")
- #       return None
+
     # Normalize the vectors
-    normal_vector = np.array(normal_vector) / np.linalg.norm(normal_vector)
-    slip_direction = np.array(slip_direction) / np.linalg.norm(slip_direction)
-    stress_direction = np.array(stress_direction) / np.linalg.norm(stress_direction)
+    normal_vector = np.array(normal_vector)
+    normal_vector = normal_vector / np.linalg.norm(normal_vector)
+
+    slip_direction = np.array(slip_direction)
+    slip_direction = slip_direction / np.linalg.norm(slip_direction)
+
+    stress_direction = np.array(stress_direction)
+    stress_direction = stress_direction / np.linalg.norm(stress_direction)
 
     # Calculate the Schmid factor
-    return np.dot(normal_vector, stress_direction) * np.dot(slip_direction, stress_direction)
+    m = np.dot(normal_vector, stress_direction) * np.dot(slip_direction, stress_direction)
+
+    return abs(m)  # Schmid factor is usually taken as absolute value
+
+

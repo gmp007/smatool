@@ -1,0 +1,92 @@
+2024-05-29 17:47:04 - INFO - SMATool calculation started at 17:47:04 on 2024-05-29
+2024-05-29 17:47:04 - INFO - ==================================
+2024-05-29 17:47:04 - INFO - Input file used in calculation:
+2024-05-29 17:47:04 - INFO - code_type: VASP
+2024-05-29 17:47:04 - INFO - use_saved_data: False
+2024-05-29 17:47:04 - INFO - use_dnn_gan: False
+2024-05-29 17:47:04 - INFO - strains: 0.01 0.8 0.01
+2024-05-29 17:47:04 - INFO - yieldpoint_offset: 0.002
+2024-05-29 17:47:04 - INFO - nlayers: 1
+2024-05-29 17:47:04 - INFO - vdwgap: 3.5
+2024-05-29 17:47:04 - INFO - dimensional: 3D
+2024-05-29 17:47:04 - INFO - mode: DFT
+2024-05-29 17:47:04 - INFO - scrystal: cubic
+2024-05-29 17:47:04 - INFO - plusminus: False
+2024-05-29 17:47:04 - INFO - use_schmid_factors: False
+2024-05-29 17:47:04 - INFO - components: ['Shear']
+2024-05-29 17:47:04 - INFO - md_supercell: [1, 1, 1]
+2024-05-29 17:47:04 - INFO - md_timestep: 2.0
+2024-05-29 17:47:04 - INFO - indent_radius: 0.5
+2024-05-29 17:47:04 - INFO - custom_options: {'potential_dir': '/home/chineduekuma/codes/vasp/PBE'}
+2024-05-29 17:47:04 - INFO - job_submit_command: mpirun -n 2 vasp_std > log
+2024-05-29 17:47:04 - INFO - structure_file: C.cif
+2024-05-29 17:47:04 - INFO - rotation: False
+2024-05-29 17:47:04 - INFO - save_struct: True
+2024-05-29 17:47:04 - INFO - slipon: True
+2024-05-29 17:47:04 - INFO - slip_parameters: 111, 112
+2024-05-29 17:47:04 - INFO - Input parameters from smatool.in ends
+2024-05-29 17:47:04 - INFO - ==================================
+2024-05-29 17:47:04 - INFO - Active component is: Shear
+2024-05-29 17:47:21 - INFO - Strain:  0.0100, Stress:  1.3755
+2024-05-29 17:47:42 - INFO - Strain:  0.0150, Stress:  2.0645
+2024-05-29 17:48:03 - INFO - Strain:  0.0200, Stress:  2.7540
+2024-05-29 17:48:25 - INFO - Strain:  0.0300, Stress:  4.1340
+2024-05-29 17:48:46 - INFO - Strain:  0.0400, Stress:  5.5155
+2024-05-29 17:49:14 - INFO - Strain:  0.0500, Stress:  6.8963
+2024-05-29 17:49:43 - INFO - Strain:  0.0600, Stress:  8.2753
+2024-05-29 17:50:12 - INFO - Strain:  0.0700, Stress:  9.6542
+2024-05-29 17:50:43 - INFO - Strain:  0.0800, Stress:  11.0259
+2024-05-29 17:51:13 - INFO - Strain:  0.0900, Stress:  12.3924
+2024-05-29 17:51:44 - INFO - Strain:  0.1000, Stress:  13.7513
+2024-05-29 17:52:15 - INFO - Strain:  0.1100, Stress:  15.1007
+2024-05-29 17:52:47 - INFO - Strain:  0.1200, Stress:  16.4398
+2024-05-29 17:53:19 - INFO - Strain:  0.1300, Stress:  17.7673
+2024-05-29 17:53:51 - INFO - Strain:  0.1400, Stress:  19.0825
+2024-05-29 17:54:22 - INFO - Strain:  0.1500, Stress:  20.3834
+2024-05-29 17:54:55 - INFO - Strain:  0.1600, Stress:  21.6684
+2024-05-29 17:55:28 - INFO - Strain:  0.1700, Stress:  22.9368
+2024-05-29 17:56:04 - INFO - Strain:  0.1800, Stress:  24.2098
+2024-05-29 17:56:41 - INFO - Strain:  0.1900, Stress:  25.4459
+2024-05-29 17:57:20 - INFO - Strain:  0.2000, Stress:  26.6452
+2024-05-29 17:58:02 - INFO - Strain:  0.2100, Stress:  27.8568
+2024-05-29 17:58:45 - INFO - Strain:  0.2200, Stress:  29.0341
+2024-05-29 17:59:24 - INFO - Strain:  0.2300, Stress:  30.1819
+2024-05-29 18:00:05 - INFO - Strain:  0.2400, Stress:  31.3268
+2024-05-29 18:00:51 - INFO - Strain:  0.2500, Stress:  32.4199
+2024-05-29 18:01:38 - INFO - Strain:  0.2600, Stress:  33.5023
+2024-05-29 18:02:26 - INFO - Strain:  0.2700, Stress:  34.5564
+2024-05-29 18:03:13 - INFO - Strain:  0.2800, Stress:  35.5846
+2024-05-29 18:03:58 - INFO - Strain:  0.2900, Stress:  36.6038
+2024-05-29 18:04:52 - INFO - Strain:  0.3000, Stress:  37.5562
+2024-05-29 18:05:48 - INFO - Strain:  0.3100, Stress:  38.4986
+2024-05-29 18:06:39 - INFO - Strain:  0.3200, Stress:  39.4272
+2024-05-29 18:07:32 - INFO - Strain:  0.3300, Stress:  40.2745
+2024-05-29 18:08:28 - INFO - Strain:  0.3400, Stress:  41.0345
+2024-05-29 18:09:21 - INFO - Strain:  0.3500, Stress:  41.7567
+2024-05-29 18:10:20 - INFO - Strain:  0.3600, Stress:  42.5909
+2024-05-29 18:11:24 - INFO - Strain:  0.3700, Stress:  43.4436
+2024-05-29 18:12:31 - INFO - Strain:  0.3800, Stress:  44.2546
+2024-05-29 18:13:42 - INFO - Strain:  0.3900, Stress:  45.0219
+2024-05-29 18:14:58 - INFO - Strain:  0.4000, Stress:  45.7949
+2024-05-29 18:16:09 - INFO - Strain:  0.4100, Stress:  46.7082
+2024-05-29 18:17:30 - INFO - Strain:  0.4200, Stress:  47.4276
+2024-05-29 18:18:46 - INFO - Strain:  0.4300, Stress:  48.1225
+2024-05-29 18:20:06 - INFO - Strain:  0.4400, Stress:  49.3798
+2024-05-29 18:21:26 - INFO - Strain:  0.4500, Stress:  52.5492
+2024-05-29 18:22:55 - INFO - Strain:  0.4600, Stress:  53.4076
+2024-05-29 18:24:30 - INFO - Strain:  0.4700, Stress:  53.8166
+2024-05-29 18:25:57 - INFO - Strain:  0.4800, Stress:  54.1675
+2024-05-29 18:27:20 - INFO - Strain:  0.4900, Stress:  56.2371
+2024-05-29 18:28:51 - INFO - Strain:  0.5000, Stress:  58.7972
+2024-05-29 18:32:36 - INFO - 
+2024-05-29 18:32:36 - INFO - Results are saved in the various component files
+2024-05-29 18:32:36 - INFO - SMATool general output is in smatool.out
+2024-05-29 18:32:36 - INFO - Enthalpy information is in enthalpy.dat
+2024-05-29 18:32:36 - INFO - Schmid factor saved in schmid_factor.dat
+2024-05-29 18:32:36 - INFO - Work hardening rate is in xx_work_hardening_rate.dat
+2024-05-29 18:32:36 - INFO - Structure info in VASP format at each strain saved in '.ss' file
+2024-05-29 18:32:36 - INFO - Yield strength profile saved in the yieldstrength_plots folder
+2024-05-29 18:32:36 - INFO - 
+2024-05-29 18:32:36 - INFO - Calculation done in 2732.34
+2024-05-29 18:32:36 - INFO - Well done! GOOD LUCK!
+2024-05-29 18:32:36 - INFO - SMATool calculation Ended at 18:32:36 on 2024-05-29

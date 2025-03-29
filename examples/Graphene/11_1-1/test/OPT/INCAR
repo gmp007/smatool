@@ -1,0 +1,24 @@
+# Step: DFT Optimization
+PREC    = Accurate
+ENCUT   = 500
+EDIFF   = 1e-6
+EDIFFG  = -0.001
+IBRION  = 2
+ISIF    = 4
+ISYM    = 2
+NSW     = 300
+ISMEAR  = 0
+SIGMA   = 0.1
+POTIM   = 0.1
+PSTRESS = 0.001
+LREAL   = False
+NPAR    = 11
+NSIM    = 4
+ALGO    = Normal
+IALGO   = 48
+ISTART  = 0
+LVDW	= True
+IVDW	= 12
+LCHARG  = .FALSE.
+LPLANE  = .TRUE.
+LWAVE   = .FALSE.

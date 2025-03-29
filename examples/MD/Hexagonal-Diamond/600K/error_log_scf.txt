@@ -1,0 +1,2 @@
+Error executing vasp_std in /share/ceph/hawk/che218_gmp007_063022/che218/Calcs/Ystrength/Hex-Diamond/600/continue directory!
+Error executing vasp_std in /share/ceph/hawk/che218_gmp007_063022/che218/Calcs/Ystrength/Hex-Diamond/600/continue directory!

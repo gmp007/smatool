@@ -1,0 +1,9 @@
+#Internal Pressure(GPa)	Enthalpy(eV)	Strain	Stress
+255.7029943978305	0.0	0.0	0.0
+nan	nan	0.01	9.197624
+nan	nan	0.015	13.881856
+nan	nan	0.02	18.525723
+nan	nan	0.03	27.744667
+nan	nan	0.04	36.712445
+nan	nan	0.05	45.645439
+-inf	-inf	0.06	54.440505

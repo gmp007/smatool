@@ -1,0 +1,155 @@
+{
+  "steps": [
+    {
+      "name": "DFT Optimization",
+      "data": {
+        "input_data": {
+          "control": {
+            "calculation": "vc-relax",
+            "restart_mode": "from_scratch",
+            "pseudo_dir": "base_path",
+            "tstress": true,
+            "tprnfor": true,
+            "forc_conv_thr": 0.00001,
+            "outdir": "./OPT"
+          },
+          "system": {
+            "ecutwfc": 60,
+            "ecutrho": 600,
+            "occupations": "smearing",
+            "smearing": "mp",
+            "degauss": 0.01
+          },
+          "electrons": {
+            "conv_thr": 1e-8
+          },
+          "cell": {
+            "cell_dofree": "all",
+            "press": 0.0,
+            "press_conv_thr": 0.5
+          },
+          "ions": {
+            "tolp": 1.0e-4  
+        },
+        "pseudopotentials": "pseudopotentials",
+        "kpts": "kpts"
+
+        }
+      }
+    },
+    {
+      "name": "DFT Yield Strength",
+      "data": {
+        "input_data": {
+          "control": {
+            "calculation": "relax",
+            "restart_mode": "from_scratch",
+            "pseudo_dir": "base_path",
+            "tstress": true,
+            "tprnfor": true,
+            "forc_conv_thr": 0.00001,
+            "outdir": "./OPT"
+          },
+          "system": {
+            "ecutwfc": 60,
+            "ecutrho": 600,
+            "occupations": "smearing",
+            "smearing": "mp",
+            "degauss": 0.01
+          },
+          "electrons": {
+            "conv_thr": 1e-8
+          },
+          "cell": {
+            "cell_dofree": "all",
+            "press": 0.0,
+            "press_conv_thr": 0.5
+          },
+          "ions": {
+            "tolp": 1.0e-4
+        },
+        "pseudopotentials": "pseudopotentials",
+        "kpts": "kpts"
+
+        }
+      }
+    },
+    {
+      "name": "MD Nostrain",
+      "data": {
+        "input_data": {
+          "control": {
+            "calculation": "vc-md",
+            "restart_mode": "from_scratch",
+            "pseudo_dir": "base_path",
+            "tstress": true,
+            "tprnfor": true,
+            "forc_conv_thr": 0.00001,
+            "outdir": "./OPT"
+          },
+          "system": {
+            "ecutwfc": 60,
+            "ecutrho": 600,
+            "occupations": "smearing",
+            "smearing": "mp",
+            "degauss": 0.01
+          },
+          "electrons": {
+            "conv_thr": 1e-8
+          },
+          "cell": {
+            "cell_dofree": "all",
+            "press": 0.0,
+            "press_conv_thr": 0.5
+          },
+          "ions": {
+            "tolp": 1.0e-4,
+            "tempw": 300
+        },
+        "pseudopotentials": "pseudopotentials",
+        "kpts": "kpts"
+
+        }
+      }
+    },
+    {
+      "name": "MD Yield Strength",
+      "data": {
+        "input_data": {
+          "control": {
+            "calculation": "md",
+            "restart_mode": "from_scratch",
+            "pseudo_dir": "base_path",
+            "tstress": true,
+            "tprnfor": true,
+            "forc_conv_thr": 0.00001,
+            "outdir": "./OPT"
+          },
+          "system": {
+            "ecutwfc": 60,
+            "ecutrho": 600,
+            "occupations": "smearing",
+            "smearing": "mp",
+            "degauss": 0.01
+          },
+          "electrons": {
+            "conv_thr": 1e-8
+          },
+          "cell": {
+            "cell_dofree": "all",
+            "press": 0.0,
+            "press_conv_thr": 0.5
+          },
+          "ions": {
+            "tolp": 1.0e-4,
+            "tempw": 300
+        },
+        "pseudopotentials": "pseudopotentials",
+        "kpts": "kpts"
+
+        }
+      }
+    }
+  ]
+}
+
