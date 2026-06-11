@@ -17,12 +17,34 @@ import pandas as pd
 import logging
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
-from scipy.integrate import trapz
+from scipy.integrate import trapezoid
 from scipy.stats import linregress
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 #from ase.eos import EquationOfState
 from ase.units import kJ
+
+
+def _validate_curve_fit_data(x_values, y_values, parameter_count, fit_name):
+    x_values = np.array(x_values, dtype=float)
+    y_values = np.array(y_values, dtype=float)
+
+    if len(x_values) != len(y_values):
+        raise ValueError(
+            f"{fit_name} requires the same number of x and y values, "
+            f"but got {len(x_values)} and {len(y_values)}."
+        )
+
+    finite_mask = np.isfinite(x_values) & np.isfinite(y_values)
+    data_points = int(np.count_nonzero(finite_mask))
+    if data_points < parameter_count:
+        raise ValueError(
+            f"{fit_name} requires at least {parameter_count} finite data points "
+            f"for the selected fit, but only {data_points} were provided. "
+            "Add more strain/volume steps before fitting bulk modulus data."
+        )
+
+    return x_values[finite_mask], y_values[finite_mask]
     
         
 def process_md_stresses(stresses, atoms, dim,stress_component_list, portion_to_average=0.5):
@@ -215,7 +237,7 @@ def calculate_yield_strength(strains, stresses, dim, thickness, yieldpoint_offse
         elastic_strain_at_yield = None
 
     #Calculate toughness
-    toughness = trapz(stresses, strains)
+    toughness = trapezoid(stresses, strains)
     if dim == "2D":
         resilience = resilience/thickness #*1E-09  
         toughness  = toughness/thickness #*1E-09 
@@ -274,14 +296,18 @@ def calculate_bulk_modulus(volumes, energies, pressures, filename,dim="2D"):
             6 + BP * (eta**2 - 1) - 4 * eta**2)
         return E
 
+    B_GPa, Bp = None, None
+
     volumes = np.array(volumes, dtype=float)
     energies = np.array(energies, dtype=float)
     pressures = np.array(pressures, dtype=float)
 
-    # Initial guess for the fitting parameters
-    p0 = [min(energies), 1, 1, min(volumes)]
-    
     try:
+        volumes, energies = _validate_curve_fit_data(
+            volumes, energies, 4, "Birch-Murnaghan energy-volume fit"
+        )
+        # Initial guess for the fitting parameters
+        p0 = [min(energies), 1, 1, min(volumes)]
         popt, pcov = curve_fit(birchmurnaghan, volumes, energies, p0, maxfev=5000)
         e0, B, Bp, v0 = popt
         
@@ -311,9 +337,9 @@ def calculate_bulk_modulus(volumes, energies, pressures, filename,dim="2D"):
         plt.savefig(f'{filename}.png')
         plt.show()
         
-    except RuntimeError as e:
+    except (RuntimeError, ValueError) as e:
         print(f"An error occurred: {e}")
-        B_GPa, Bp = None, None    
+        logging.error(f"An error occurred: {e}")
 
     return B_GPa, Bp
     
@@ -452,6 +478,13 @@ def calculate_bulk_modulus2(volumes, pressures, filename, dim, start_percent=5, 
         print("Error: All volume values are the same. Cannot calculate bulk modulus.")
         return None, None
 
+    optimal_segment = 0
+    linear_volumes = volumes
+    linear_pressures = pressures
+    slope = intercept = None
+    bulk_modulus = None
+    bulk_modulus_derivative = None
+
     def find_best_linear_fit(volumes, pressures, segment_percentages):
         best_mse = float('inf')
         best_segment = 0
@@ -481,14 +514,17 @@ def calculate_bulk_modulus2(volumes, pressures, filename, dim, start_percent=5, 
         average_volume = np.mean(linear_volumes)
         bulk_modulus = average_volume * slope
 
+        fit_volumes, fit_pressures = _validate_curve_fit_data(
+            volumes, pressures, 3, "Birch-Murnaghan pressure-volume fit"
+        )
         p0 = [bulk_modulus, 4, average_volume]
-        popt, pcov = curve_fit(birchmurnaghan_pressure, volumes, pressures, p0, maxfev=10000)
+        popt, pcov = curve_fit(birchmurnaghan_pressure, fit_volumes, fit_pressures, p0, maxfev=10000)
         B0, BP, V0 = popt
         bulk_modulus_derivative = BP
 
-    except ValueError as e:
+    except (RuntimeError, ValueError) as e:
         print(f"An error occurred: {e}")
-        bulk_modulus = None
+        logging.error(f"An error occurred: {e}")
         bulk_modulus_derivative = None
 
     plt.figure(figsize=(10, 6))
@@ -496,22 +532,27 @@ def calculate_bulk_modulus2(volumes, pressures, filename, dim, start_percent=5, 
         plt.plot(volumes, pressures, 'o-', label='Pressure-Area Curve')
     else:
         plt.plot(volumes, pressures, 'o-', label='Pressure-Volume Curve')
-    if optimal_segment > 0:
+    if optimal_segment > 0 and slope is not None and intercept is not None:
         plt.plot(linear_volumes, intercept + slope * linear_volumes, 'r--', label='Linear Fit')
 
     if dim == "2D":
         plt.xlabel('Area (Å²)', fontsize=20)
         plt.ylabel('Pressure (N/m)', fontsize=20)
         plt.title('Pressure-Area Curve with Linear Fit')
-        textstr = f'Stiffness Constant (K): {bulk_modulus:.2f} \nBp (K\'): {bulk_modulus_derivative:.2f}'
+        textstr = ''
+        if bulk_modulus is not None and bulk_modulus_derivative is not None:
+            textstr = f'Stiffness Constant (K): {bulk_modulus:.2f} \nBp (K\'): {bulk_modulus_derivative:.2f}'
     else:
         plt.xlabel('Volume (Å³)', fontsize=20)
         plt.ylabel('Pressure (GPa)', fontsize=20)
         plt.title('Pressure-Volume Curve with Linear Fit')
-        textstr = f'Bulk Modulus (K): {bulk_modulus:.2f} GPa\nBp (K\'): {bulk_modulus_derivative:.2f}'
+        textstr = ''
+        if bulk_modulus is not None and bulk_modulus_derivative is not None:
+            textstr = f'Bulk Modulus (K): {bulk_modulus:.2f} GPa\nBp (K\'): {bulk_modulus_derivative:.2f}'
     
-    plt.gca().text(0.05, 0.95, textstr, transform=plt.gca().transAxes, fontsize=14,
-                   verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
+    if textstr:
+        plt.gca().text(0.05, 0.95, textstr, transform=plt.gca().transAxes, fontsize=14,
+                       verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
 
     plt.legend()
     plt.grid(True)
@@ -580,7 +621,7 @@ def compute_average_stress(stress_component_list, dim,stress_components, atoms):
            #                 ]  )
             
             #average_stress = -conversion_lz*np.linalg.eigvalsh(sigma) 
-            #average_stress = np.sqrt(average_stress[0]**2 + average_stress[1]**2 + average_stress[2]**2  )
+            #average_stress = np.sqrt(average_stress[0]**2 + average_stress[1]**2 + stress_components[2, 2]**2  )
         return average_stress             
     elif stress_component_list == "ideal_strength":
         if dim == "3D":
