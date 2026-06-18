@@ -132,7 +132,7 @@ If you have used the SMATool package in your research, please cite:
 
 @article{Ekuma2024,
   title = {SMATool: Strength of Materials Analysis Toolkit},
-  journal = {Computer Programs in Physics},
+  journal = {Computer Physics Communications},
   volume = {300},
   pages = {109189},
   year = {2024},
